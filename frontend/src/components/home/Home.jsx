@@ -1,4 +1,5 @@
 import "./Home.css";
+import { getStockStatus } from "../../utils/stockStatus";
 import {
   Boxes,
   ChevronsDown,
@@ -7,15 +8,16 @@ import {
   House,
 } from "lucide-react";
 
-function Home({
-  items,
-  normalItems,
-  fewItems,
-  alertItems,
-  getStockStatus,
-  setCurrentPage,
-  setInitialStatus,
-}) {
+function Home({ allItems, setCurrentPage, setInitialStatus }) {
+  const normalItems = allItems.filter(
+    (item) => getStockStatus(item).status === "正常",
+  );
+  const fewItems = allItems.filter(
+    (item) => getStockStatus(item).status === "少ない",
+  );
+  const alertItems = allItems.filter(
+    (item) => getStockStatus(item).status === "注意",
+  );
   return (
     <>
       <div>
@@ -33,7 +35,7 @@ function Home({
             <div className="summary-text">
               <p style={{ color: " #b08d57" }}>全商品数</p>
               <div className="summary-number">
-                <h2>{items.length}</h2>
+                <h2>{allItems.length}</h2>
                 <span>商品</span>
               </div>
             </div>
@@ -82,29 +84,30 @@ function Home({
           <div className="home-alert">
             <h2>在庫注意の商品</h2>
 
-            {alertItems.slice(0, 3).map((item) => (
-              <div key={item.id} className="alert-item">
-                <span
-                  style={{
-                    color: getStockStatus(item.current_stock, item.minStock)
-                      .alertColor,
-                  }}
-                >
-                  ●
-                </span>
-                <span>{item.name}</span>
-                <span>{item.category.name}</span>
-                <span>{item.current_stock}個</span>
-                <span
-                  style={{
-                    color: getStockStatus(item.current_stock, item.minStock)
-                      .alertColor,
-                  }}
-                >
-                  {getStockStatus(item.current_stock, item.minStock).status}
-                </span>
-              </div>
-            ))}
+            {alertItems.slice(0, 3).map((item) => {
+              const status = getStockStatus(item);
+              return (
+                <div key={item.id} className="alert-item">
+                  <span
+                    style={{
+                      color: status.alertColor,
+                    }}
+                  >
+                    ●
+                  </span>
+                  <span>{item.name}</span>
+                  <span>{item.category.name}</span>
+                  <span>{item.current_stock}個</span>
+                  <span
+                    style={{
+                      color: status.alertColor,
+                    }}
+                  >
+                    {status.status}
+                  </span>
+                </div>
+              );
+            })}
             <button
               onClick={() => {
                 setInitialStatus("注意");
@@ -117,29 +120,30 @@ function Home({
           <div className="home-few">
             <h2>在庫が少ない商品</h2>
 
-            {fewItems.slice(0, 3).map((item) => (
-              <div key={item.id} className="few-item">
-                <span
-                  style={{
-                    color: getStockStatus(item.current_stock, item.minStock)
-                      .alertColor,
-                  }}
-                >
-                  ●
-                </span>
-                <span>{item.name}</span>
-                <span>{item.category.name}</span>
-                <span>{item.current_stock}個</span>
-                <span
-                  style={{
-                    color: getStockStatus(item.current_stock, item.minStock)
-                      .alertColor,
-                  }}
-                >
-                  {getStockStatus(item.current_stock, item.minStock).status}
-                </span>
-              </div>
-            ))}
+            {fewItems.slice(0, 3).map((item) => {
+              const status = getStockStatus(item);
+              return (
+                <div key={item.id} className="few-item">
+                  <span
+                    style={{
+                      color: status.alertColor,
+                    }}
+                  >
+                    ●
+                  </span>
+                  <span>{item.name}</span>
+                  <span>{item.category.name}</span>
+                  <span>{item.current_stock}個</span>
+                  <span
+                    style={{
+                      color: status.alertColor,
+                    }}
+                  >
+                    {status.status}
+                  </span>
+                </div>
+              );
+            })}
             <button
               onClick={() => {
                 setInitialStatus("少ない");

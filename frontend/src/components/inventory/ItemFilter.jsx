@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { getStockStatus } from "../../utils/stockStatus";
 
-function ItemFilter({ items, setDisplayItems, categories, initialStatus }) {
+function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
   const [selectedCategory, setSelectedCategory] = useState("すべて");
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [sortOrder, setSortOrder] = useState("default");
 
   useEffect(() => {
-    let filterItems = [...items];
+    let filterItems = [...allItems];
 
     // カテゴリ絞り込み
     if (selectedCategory !== "すべて") {
@@ -20,7 +20,7 @@ function ItemFilter({ items, setDisplayItems, categories, initialStatus }) {
     // 状態絞り込み
     if (selectedStatus !== "すべて") {
       filterItems = filterItems.filter((item) => {
-        const stockStatus = getStockStatus(item.current_stock, item.minStock);
+        const stockStatus = getStockStatus(item);
 
         return stockStatus.status === selectedStatus;
       });
@@ -42,7 +42,7 @@ function ItemFilter({ items, setDisplayItems, categories, initialStatus }) {
     }
     setDisplayItems(filterItems);
   }, [
-    items,
+    allItems,
     selectedCategory,
     selectedStatus,
     sortOrder,

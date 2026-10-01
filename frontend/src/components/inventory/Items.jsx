@@ -1,50 +1,74 @@
 import { useState } from "react";
-import { deleteItem } from "../../api/itemApi";
-import { Package } from "lucide-react";
+import { getStockStatus } from "../../utils/stockStatus";
+import { Package, OctagonAlert } from "lucide-react";
+import ItemCard from "./ItemCard";
+import ItemFilter from "./ItemFilter";
+import AddItemModal from "./AddItemModal";
+import CategoryModal from "./CategoryModal";
 import "./Inventory.css";
-/**
- * 商品一覧を表示する。
- *
- * 在庫数の変更や商品の削除も行う。
- */
+
 function Items({
-  displayItems,
-  selectedItemId,
-  setSelectedItemId,
-  stockChange,
-  setStockChange,
-  updateStock,
-  onItemDeleted,
-  getStockStatus,
-  setIsItemModalOpen,
-  itemFilter,
+  allItems,
+  categories,
+  onUpdateStock,
+  onItemsChanged,
+  onCategoriesChanged,
+  initialStatus,
 }) {
-  const [isDeleteItemModalOpen, setIsDeleteItemModalOpen] = useState(false);
+  const [displayItems, setDisplayItems] = useState([]);
+  const [isSelected, setIsSelected] = useState(null);
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
-  const handleDeleteItem = async () => {
-    await deleteItem(selectedItemId);
-    await onItemDeleted();
-
-    setSelectedItemId(null);
-    setIsDeleteItemModalOpen(false);
-  };
+  const alertItems = allItems.filter(
+    (item) => getStockStatus(item).status === "注意",
+  );
 
   return (
     <>
+      {/* 在庫注意簡易表示 */}
+      {alertItems.length > 0 && (
+        <div className="alert-box">
+          <span className="alert-box-icon">
+            <OctagonAlert size={20} /> 在庫注意
+          </span>
+          <span>
+            <span>{alertItems.length}件の商品があります</span>
+          </span>
+        </div>
+      )}
+
       <div className="items-header">
         <h1 className="page-title">
           <Package size={32} />
           商品一覧
         </h1>
-        <button
-          className="item-add-button"
-          onClick={() => setIsItemModalOpen(true)}
-        >
-          ＋ 商品を追加
-        </button>
+        <div className="items-header-actions">
+          <button
+            className="category-button"
+            onClick={async () => {
+              await onCategoriesChanged();
+              setIsCategoryModalOpen(true);
+            }}
+          >
+            カテゴリ管理
+          </button>
+
+          <button
+            className="item-add-button"
+            onClick={() => setIsAddItemModalOpen(true)}
+          >
+            ＋ 商品を追加
+          </button>
+        </div>
       </div>
 
-      {itemFilter}
+      <ItemFilter
+        allItems={allItems}
+        setDisplayItems={setDisplayItems}
+        categories={categories}
+        initialStatus={initialStatus}
+      />
 
       <table className="item-table">
         <thead>
@@ -58,142 +82,35 @@ function Items({
           </tr>
         </thead>
         <tbody>
-          {displayItems.map((item) => {
-            const status = getStockStatus(item.current_stock, item.minStock);
-
-            return (
-              <tr
-                className="item"
-                key={item.id}
-                style={{ backgroundColor: status.alertBackgroundColor }}
-                onClick={() => {
-                  setSelectedItemId(item.id);
-                  setStockChange(0);
-                }}
-              >
-                <td>
-                  <span
-                    className="category-color"
-                    style={{ color: item.category?.colorCode }}
-                  >
-                    ◆
-                  </span>
-                </td>
-                <td>
-                  <span className="item-name">{item.name}</span>
-                </td>
-
-                <td>
-                  <span
-                    className="item-category"
-                    style={{ backgroundColor: item.category?.colorCode }}
-                  >
-                    {item.category?.name}
-                  </span>
-                </td>
-
-                <td>
-                  <div className="item-stock">
-                    {selectedItemId === item.id && (
-                      <button
-                        className="stock-control"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setStockChange((prev) =>
-                            Math.max(prev - 1, -item.current_stock),
-                          );
-                        }}
-                        disabled={item.current_stock === 0}
-                      >
-                        −
-                      </button>
-                    )}
-                    <span className="stock-number">
-                      {selectedItemId === item.id && stockChange !== 0 && (
-                        <span className="stock-change">
-                          {stockChange > 0 ? "+" : ""}
-                          {stockChange}
-                        </span>
-                      )}
-                      <span>{item.current_stock}</span>
-                    </span>
-                    {selectedItemId === item.id && (
-                      <button
-                        className="stock-control"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setStockChange((prev) => prev + 1);
-                        }}
-                      >
-                        ＋
-                      </button>
-                    )}
-                    {selectedItemId === item.id && (
-                      <button
-                        className="stock-decision"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (stockChange !== 0) {
-                            updateStock(item, item.current_stock + stockChange);
-                          }
-                          setStockChange(0);
-                          setSelectedItemId(null);
-                        }}
-                      >
-                        ✓
-                      </button>
-                    )}
-                  </div>
-                  <span>個</span>
-                </td>
-
-                <td>
-                  <span
-                    className="item-status"
-                    style={{ color: status.alertColor }}
-                  >
-                    ● {status.stockStatus}
-                  </span>
-                </td>
-
-                <td>
-                  {selectedItemId === item.id && (
-                    <button
-                      className="item-delete"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        setSelectedItemId(item.id);
-                        setIsDeleteItemModalOpen(true);
-                      }}
-                    >
-                      🗑
-                    </button>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
+          {displayItems.map((item) => (
+            <ItemCard
+              key={item.id}
+              item={item}
+              isSelected={isSelected === item.id}
+              onSelectItem={setIsSelected}
+              onUpdateStock={onUpdateStock}
+              onItemsChanged={onItemsChanged}
+            />
+          ))}
         </tbody>
       </table>
-      {isDeleteItemModalOpen && (
-        <div className="modal-overlay">
-          <div className="delete-modal">
-            <h3>この商品を削除しますか？</h3>
-
-            <div className="delete-modal-buttons">
-              <button onClick={() => setIsDeleteItemModalOpen(false)}>
-                キャンセル
-              </button>
-
-              <button
-                className="delete-confirm-button"
-                onClick={handleDeleteItem}
-              >
-                削除する
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* カテゴリ管理モーダル */}
+      {isCategoryModalOpen && (
+        <CategoryModal
+          categories={categories}
+          allItems={allItems}
+          onClose={() => setIsCategoryModalOpen(false)}
+          onCategoriesChanged={onCategoriesChanged}
+        />
+      )}
+      {/* 商品追加モーダル */}
+      {isAddItemModalOpen && (
+        <AddItemModal
+          categories={categories}
+          onClose={() => setIsAddItemModalOpen(false)}
+          onItemCreated={onItemsChanged}
+          onCategoriesChanged={onCategoriesChanged}
+        />
       )}
     </>
   );

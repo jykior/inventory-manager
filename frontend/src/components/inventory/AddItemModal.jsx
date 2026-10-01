@@ -1,16 +1,15 @@
-import { useEffect, useState } from "react";
-import { createItem, getCategories } from "../../api/itemApi";
+import { useState } from "react";
+import { createItem } from "../../api/itemApi";
 import AddCategoryModal from "./AddCategoryModal";
 
-function AddItemModal({ onClose, onItemCreated }) {
+function AddItemModal({ categories ,onClose, onItemCreated,onCategoriesChanged }) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
-  const [categories, setCategories] = useState([]);
   const [currentStock, setCurrentStock] = useState("");
   const [minStock, setMinStock] = useState("");
   const [alertEnabled, setAlertEnabled] = useState(true);
   const [error, setError] = useState("");
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("");
 /**
  * 商品を登録する。
@@ -48,13 +47,6 @@ function AddItemModal({ onClose, onItemCreated }) {
       } else setError("※同じ商品名がすでに登録されています※");
     }
   };
-  const fetchCategories = async () => {
-    const data = await getCategories();
-    setCategories(data);
-  };
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
   return (
     <div className="modal-overlay">
@@ -62,7 +54,7 @@ function AddItemModal({ onClose, onItemCreated }) {
         <div className="item-modal-header">
           <h2>商品を追加</h2>
 
-          <button onClick={onClose}>×</button>
+          <button className="close-button" onClick={onClose}>×</button>
         </div>
 
         {error && <p className="form-error">{error}</p>}
@@ -79,7 +71,7 @@ function AddItemModal({ onClose, onItemCreated }) {
           <label>
             カテゴリ<span className="required"> *</span>
           </label>
-          <button type="button" onClick={() => setIsCategoryModalOpen(true)}>
+          <button type="button" onClick={() => setIsAddCategoryModalOpen(true)}>
             ＋追加
           </button>
         </div>
@@ -142,10 +134,10 @@ function AddItemModal({ onClose, onItemCreated }) {
       </div>
 
       {/*カテゴリ追加モーダル*/}
-      {isCategoryModalOpen && (
+      {isAddCategoryModalOpen && (
         <AddCategoryModal
-          onClose={() => setIsCategoryModalOpen(false)}
-          onCategoryCreated={fetchCategories}
+          onClose={() => setIsAddCategoryModalOpen(false)}
+          onCategoryCreated={onCategoriesChanged}
         />
       )}
     </div>

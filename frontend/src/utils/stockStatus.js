@@ -1,7 +1,10 @@
 /**
  * 在庫数と最低在庫数から在庫状態を判定する。
  */
-export const getStockStatus = (stock, alert) => {
+export const getStockStatus = (item) => {
+  const stock = item.current_stock;
+  const alert = item.minStock;
+
   if (stock >= alert + 3) {
     return { status: "正常", alertColor: "#289046" };
   }
@@ -20,3 +23,4 @@ export const getStockStatus = (stock, alert) => {
     stockStatus: "注意",
   };
 };
+

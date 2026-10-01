@@ -72,27 +72,42 @@
   margin-bottom: 20px;
 }
 
-.item-add-button {
-  width: 130px;
+.items-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.category-button {
   height: 40px;
+  padding: 0 22px;
+  border-radius: 8px;
+  background: #fff;
+  color: #9a7229;
+  border: 1px solid #c9a45c;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.category-button:hover {
+  background: #f8f1e3;
+}
+
+.item-add-button {
+  height: 40px;
+  padding: 0 22px;
+  border-radius: 8px;
   background: #c9a45c;
   color: #181818;
   border: none;
-  border-radius: 30px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  white-space: nowrap;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .item-add-button:hover {
   background: #e3c27d;
-  transform: translateY(-2px);
-}
-
-.item-add-button:active {
-  transform: translateY(0);
 }
 
 .item-table {
@@ -234,6 +249,138 @@
   background: #f9e8e5;
 }
 
+/* カテゴリ管理モーダル */
+
+.category-modal {
+  width: 90%;
+  max-width: 720px;
+  max-height: 80vh;
+  background: #fffdf8;
+  border-radius: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.category-header h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.category-header p {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+}
+
+.category-table-wrapper {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.category-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  table-layout: fixed;
+}
+
+.category-table th,
+.category-table td {
+  text-align: center;
+  border-bottom: 1px solid #ddd6c8;
+}
+
+.category-table th {
+  background: #f3f1ed;
+  font-weight: bold;
+}
+
+.category-table td {
+  height: 50px;
+}
+
+.category-table th:nth-child(1),
+.category-table td:nth-child(1) {
+  width: 45%;
+}
+
+.category-table th:nth-child(2),
+.category-table td:nth-child(2) {
+  width: 15%;
+}
+
+.category-table th:nth-child(3),
+.category-table td:nth-child(3) {
+  width: 20%;
+}
+
+.category-table th:nth-child(4),
+.category-table td:nth-child(4) {
+  width: 20%;
+}
+
+.category-actions {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.category-edit-button,
+.category-delete-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.category-edit-button {
+  border: 1px solid #d6c39d;
+  background: #fffaf0;
+  color: #8f6b28;
+}
+
+.category-edit-button:hover {
+  background: #f8f1e3;
+}
+
+.category-delete-button {
+  border: 1px solid #d8bebe;
+  background: #fff8f7;
+  color: #c62828;
+}
+
+.category-delete-button:hover {
+  background: #fff0ed;
+}
+
+.category-add-button {
+  align-self: flex-end;
+  margin-top: 12px;
+  padding: 9px 16px;
+  border: 1px solid #c9a45c;
+  border-radius: 7px;
+  background: #fff;
+  color: #9a7229;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.category-add-button:hover {
+  background: #f8f1e3;
+}
 /*商品追加モーダル*/
 .modal-overlay {
   position: fixed;
@@ -267,8 +414,7 @@
   font-size: 16px;
 }
 
-.item-modal-header button,
-.category-modal-header button {
+.close-button {
   border: none;
   background: #f3efe7;
   width: 34px;
@@ -276,6 +422,10 @@
   border-radius: 50%;
   font-size: 20px;
   cursor: pointer;
+}
+
+.close-button:hover {
+  background: #e9e1d3;
 }
 
 .item-modal label {
@@ -355,7 +505,7 @@
 }
 
 /* カテゴリ追加モーダル */
-.category-modal {
+.category-form-modal {
   width: 100%;
   max-width: 360px;
   background: #fffdf8;
@@ -365,19 +515,19 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 }
 
-.category-modal-header {
+.category-form-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 }
 
-.category-modal-header h2 {
+.category-form-modal-header h2 {
   margin: 0;
   font-size: 20px;
 }
 
-.category-modal label {
+.category-form-modal label {
   display: block;
   margin-bottom: 24px;
   font-size: 13px;
@@ -404,7 +554,7 @@
   box-shadow: 0 0 0 2px #fff;
 }
 
-.category-modal input {
+.category-form-modal input {
   display: block;
   width: 100%;
   margin-top: 8px;
@@ -417,7 +567,7 @@
   outline: none;
 }
 
-.category-modal input:focus {
+.category-form-modal input:focus {
   border-color: #c9a45c;
 }
 

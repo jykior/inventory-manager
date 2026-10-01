@@ -59,10 +59,11 @@
 
 ### フロントエンド
 
-- React / JavaScript / CSS
+- React 19.2.8 / Node.js 24.19.0 / JavaScript / CSS
 
-### データベース
+### インフラ・DB
 
+- AWS ( VPC , EC2 , RDS , ALB , ACM )
 - MySQL 8.0
 
 ### データアクセス
@@ -71,26 +72,26 @@
 
 ### 開発環境・ツール
 
-- Node.js 24.19.0
-- Visual Studio Code
-- IntelliJ IDEA
 - Postman
 - Git
 - GitHub
+- Visual Studio Code
+- IntelliJ IDEA
 
 ## 🏷️技術選定理由
 
 ### Spring Boot
 
 Javaでのバックエンド開発を学習することを目的として採用しました。
-また、REST APIを構築しやすく、Spring Securityによる認証・認可や
-データベース連携にも対応しやすい点を考慮しました。
+またSpring Bootを通してREST APIの構築や、
+Spring Securityを利用した認証・認可の仕組みを理解したいと考え採用しました。
 
 ### React
 
-商品情報や在庫数など、画面の状態が頻繁に変化するため採用しました。
-また、商品カードやモーダルなどのUIパーツをコンポーネントとして管理でき、
-状態の変化に応じて画面を自動更新できる点も採用理由です。
+フロントエンド技術について調べる中で、Reactが広く利用されていることを知り、
+実務で使用される機会が多い技術を学びたいと考え採用しました。
+またコンポーネント単位でUIを管理できるため、
+商品一覧やモーダルなどを整理しやすくなると思ったのも採用理由です。
 
 ## 💡工夫した点
 
@@ -188,12 +189,6 @@ Spring Bootのエラー処理で使用される/errorがSpring Securityの認証
 カテゴリの名前、並び順、カテゴリごとのカラーを編集できる機能を実施予定です。
 
 ![カテゴリ管理モーダル]()
-
-### 在庫注意画面
-
-在庫がアラート基準を下回った商品を確認できる画面を実装予定です。
-
-![在庫注意画面]()
 
 ### 設定画面
 
@@ -295,19 +290,45 @@ erDiagram
 一方、Web上でのデモ利用では複数ユーザーが同時に利用する可能性を考慮し、
 実データをコピーしたデモデータをゲストユーザーごとに分離する機能を実装予定です。
 
-## 🟢APIのURL設計
+## 🟢 APIのURL設計
 
-| HTTPメソッド | URL                     | 処理内容     |
-|----------|-------------------------|----------|
-| GET      | `/api/items`            | 商品一覧取得   |
-| POST     | `/api/items`            | 商品登録     |
-| PUT      | `/api/items/{id}`       | 商品更新     |
-| DELETE   | `/api/items/{id}`       | 商品削除     |
-| PATCH    | `/api/items/{id}/stock` | 在庫数更新    |
-| GET      | `/api/categories`       | カテゴリ一覧取得 |
-| POST     | `/api/categories`       | カテゴリ登録   |
+### 商品API
+
+| HTTPメソッド | URL | 処理内容 |
+|---|---|---|
+| GET | `/api/items` | 商品一覧取得 |
+| POST | `/api/items` | 商品登録 |
+| PUT | `/api/items/{id}` | 商品更新 |
+| DELETE | `/api/items/{id}` | 商品削除 |
+| PATCH | `/api/items/{id}/stock` | 在庫数更新 |
+
+### カテゴリAPI
+
+| HTTPメソッド | URL | 処理内容 |
+|---|---|---|
+| GET | `/api/categories` | カテゴリー一覧取得 |
+| POST | `/api/categories` | カテゴリー登録 |
+| PUT | `/api/categories/{id}` | カテゴリー更新 |
+| DELETE | `/api/categories/{id}` | カテゴリー削除 |
+
+### 認証・ユーザーAPI
+
+| HTTPメソッド | URL | 処理内容 |
+|---|---|---|
 | POST | `/api/auth/login` | ログイン |
 | POST | `/api/auth/register` | ユーザー登録 |
+| PATCH | `/api/auth/{id}/role` | ユーザー権限変更 |
+| PATCH | `/api/auth/email` | メールアドレス変更 |
+| PATCH | `/api/auth/password` | パスワード変更 |
+| DELETE | `/api/auth` | ユーザー削除 |
+| GET | `/api/auth/users` | ユーザー一覧取得 |
+
+### ゲストAPI
+
+| HTTPメソッド | URL | 処理内容 |
+|---|---|---|
+| POST | `/api/guest/login` | ゲストログイン |
+| POST | `/api/guest/logout` | ゲストログアウト |
 
 ## 💻環境構築手順
 
@@ -377,12 +398,10 @@ npm run dev
 - ✅ Spring Security導入
 - ✅ ユーザー新規登録機能
 - ✅ ロール別権限管理
+- ✅ ホーム画面作成
 - ✅ ゲストアカウント作成
+- ✅ ゲストログインの複数人対応
 - ⬜ 商品・カテゴリの編集
 - ⬜ 商品の並び替え
-- ⬜ 在庫注意画面作成
-- ⬜ 在庫注意商品の表示
-- ⬜ ホーム画面作成
-- ⬜ ゲストログインの複数人対応
 - ⬜ AWS RDSへの移行
 - ⬜ デプロイ・公開

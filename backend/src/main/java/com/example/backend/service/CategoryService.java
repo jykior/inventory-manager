@@ -41,7 +41,7 @@ public class CategoryService {
     if (isDemo) {
       guestId = guestService.getCurrentGuestId();
     }
-    return categoryRepository.findAllByIsDemoAndGuestId(isDemo,guestId);
+    return categoryRepository.findAllByIsDemoAndGuestId(isDemo, guestId);
   }
 
   public Category createCategory(Category category) {
@@ -51,13 +51,40 @@ public class CategoryService {
     if (isDemo) {
       guestId = guestService.getCurrentGuestId();
     }
-    if (categoryRepository.existsByNameAndIsDemoAndGuestId(category.getName(), isDemo,guestId)) {
-      throw new IllegalArgumentException();
+    if (categoryRepository.existsByNameAndIsDemoAndGuestId(category.getName(), isDemo, guestId)) {
+      throw new IllegalArgumentException("CATEGORY_NAME_ALREADY_EXISTS");
     }
     category.setIsDemo(isDemo);
     category.setGuestId(guestId);
 
     return categoryRepository.save(category);
+  }
+
+  public Category updateCategory(Long id, Category category) {
+    boolean isDemo = isGuest();
+    Long guestId = null;
+
+    if (isDemo) {
+      guestId = guestService.getCurrentGuestId();
+    }
+
+    Category existingCategory =
+        categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
+            .orElseThrow(IllegalArgumentException::new);
+
+    if (!existingCategory.getName().equals(category.getName())
+        && categoryRepository.existsByNameAndIsDemoAndGuestId(
+        category.getName(),
+        isDemo,
+        guestId)
+    ) {
+      throw new IllegalArgumentException("CATEGORY_NAME_ALREADY_EXISTS");
+    }
+
+    existingCategory.setName(category.getName());
+    existingCategory.setColorCode(category.getColorCode());
+
+    return categoryRepository.save(existingCategory);
   }
 
   public void deleteCategory(Long id) {
@@ -67,8 +94,7 @@ public class CategoryService {
     if (isDemo) {
       guestId = guestService.getCurrentGuestId();
     }
-    Category category = categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo,guestId)
-        .orElseThrow(IllegalArgumentException::new);
+    Category category = categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId).orElseThrow(IllegalArgumentException::new);
 
     categoryRepository.delete(category);
   }

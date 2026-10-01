@@ -1,5 +1,6 @@
-package com.example.backend.security;
+package com.example.backend.config;
 
+import com.example.backend.security.UserDetailsServiceImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -52,7 +53,7 @@ public class SecurityConfig {
         .securityContext(context -> context.securityContextRepository(securityContextRepository()))
         .authenticationProvider(authenticationProvider)
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/login", "/api/auth/register", "/api/guest/login", "/error").permitAll()
+            .requestMatchers("/api/auth/login", "/api/auth/register", "/api/guest/login", "/error","/health").permitAll()
             .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
             // 商品・カテゴリ操作
             .requestMatchers(HttpMethod.GET, "/api/items", "/api/categories")
@@ -94,7 +95,7 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
 
-    configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+    configuration.setAllowedOrigins(List.of("http://localhost:5173", "https://inventorymanager-test.netlify.app"));
 
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 

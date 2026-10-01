@@ -65,8 +65,33 @@ export const updateStock = async (item, newStock) => {
   return response.json();
 };
 
+export const updateCategory = async (id, category) => {
+  const response = await fetch(`${API_URL}/api/categories/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(category),
+  });
+  if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error("CATEGORY_FAILED");
+    }
+    throw new Error("CATEGORY_REQUEST_FAILED");
+  }
+  return response.json();
+};
+
 export const deleteItem = async (id) => {
   const response = await fetch(`${API_URL}/api/items/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+};
+
+export const deleteCategory = async (id) => {
+  const response = await fetch(`${API_URL}/api/categories/${id}`, {
     method: "DELETE",
     credentials: "include",
   });

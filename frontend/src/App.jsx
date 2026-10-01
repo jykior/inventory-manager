@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import {
-  getItems,
-  getCategories,
-  updateStock as updateStockApi,
-} from "./api/itemApi";
-import { getStockStatus } from "./utils/stockStatus";
+import { getItems, getCategories } from "./api/itemApi";
 import { guestLogout } from "./api/authApi";
-import { User, OctagonAlert } from "lucide-react";
+import { User } from "lucide-react";
 import Items from "./components/inventory/Items";
-import ItemFilter from "./components/inventory/ItemFilter";
-import ItemModal from "./components/inventory/AddItemModal";
 import Sidebar from "./components/common/Sidebar";
 import Login from "./components/auth/Login";
 import Admin from "./components/admin/Admin";
@@ -18,21 +11,16 @@ import Home from "./components/home/Home";
 import Setting from "./components/setting/Setting";
 
 function App() {
-  const [items, setItems] = useState([]);
-  const [displayItems, setDisplayItems] = useState([]);
+  const [allItems, setAllItems] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [currentPage, setCurrentPage] = useState("setting");
+  const [currentPage, setCurrentPage] = useState("items");
   const [initialStatus, setInitialStatus] = useState("すべて");
-  const [selectedItemId, setSelectedItemId] = useState(null);
-  const [stockChange, setStockChange] = useState(0);
-  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
 
   const fetchItems = async () => {
     const data = await getItems();
-    setItems(data);
-    setDisplayItems(data);
+    setAllItems(data);
   };
 
   const fetchCategories = async () => {
@@ -97,40 +85,17 @@ function App() {
     setIsLoggedIn(false);
   };
 
-  const normalItems = items.filter(
-    (item) =>
-      getStockStatus(item.current_stock, item.minStock).status === "正常",
-  );
-
-  const fewItems = items.filter(
-    (item) =>
-      getStockStatus(item.current_stock, item.minStock).status === "少ない",
-  );
-
-  const alertItems = items.filter(
-    (item) =>
-      getStockStatus(item.current_stock, item.minStock).status === "注意",
-  );
-
   /**
-   * 商品の在庫数を更新する。
-   *
-   * 在庫数を更新した後、
-   * 更新された商品だけをitemsのstateに反映する。
+   * 在庫数変更後の商品をallItemsのstateに反映する。
    */
-  const updateStock = async (item, newStock) => {
-    const updatedItem = await updateStockApi(item, newStock);
-
-    setItems((prevItems) =>
-      prevItems.map((item) => {
-        if (item.id === updatedItem.id) {
-          return updatedItem;
-        } else {
-          return item;
-        }
-      }),
+  const handleUpdateStock = (updatedItem) => {
+    setAllItems((prevAllItems) =>
+      prevAllItems.map((item) =>
+        item.id === updatedItem.id ? updatedItem : item,
+      ),
     );
   };
+
   return (
     <div className="app">
       <Sidebar
@@ -155,11 +120,7 @@ function App() {
           {/*HOME画面*/}
           {currentPage === "home" && (
             <Home
-              items={items}
-              normalItems={normalItems}
-              fewItems={fewItems}
-              alertItems={alertItems}
-              getStockStatus={getStockStatus}
+              allItems={allItems}
               setCurrentPage={setCurrentPage}
               setInitialStatus={setInitialStatus}
             />
@@ -168,37 +129,13 @@ function App() {
           {/* 商品一覧画面 */}
           {currentPage === "items" && (
             <>
-              {/* 在庫注意簡易表示 */}
-              {alertItems.length > 0 && (
-                <div className="alert-box">
-                  <span className="alert-box-icon">
-                    <OctagonAlert size={20} /> 在庫注意
-                  </span>
-                  <span>
-                    <span>{alertItems.length}件の商品があります</span>
-                  </span>
-                </div>
-              )}
-
-              {/* 商品一覧 */}
               <Items
-                displayItems={displayItems}
-                selectedItemId={selectedItemId}
-                setSelectedItemId={setSelectedItemId}
-                stockChange={stockChange}
-                setStockChange={setStockChange}
-                updateStock={updateStock}
-                onItemDeleted={fetchItems}
-                getStockStatus={getStockStatus}
-                setIsItemModalOpen={setIsItemModalOpen}
-                itemFilter={
-                  <ItemFilter
-                    items={items}
-                    setDisplayItems={setDisplayItems}
-                    categories={categories}
-                    initialStatus={initialStatus}
-                  />
-                }
+                allItems={allItems}
+                categories={categories}
+                onUpdateStock={handleUpdateStock}
+                onItemsChanged={fetchItems}
+                onCategoriesChanged={fetchCategories}
+                initialStatus={initialStatus}
               />
             </>
           )}
@@ -213,14 +150,6 @@ function App() {
 
           {currentPage === "admin" && <Admin />}
         </div>
-
-        {/* 商品追加モーダル */}
-        {isItemModalOpen && (
-          <ItemModal
-            onClose={() => setIsItemModalOpen(false)}
-            onItemCreated={fetchItems}
-          />
-        )}
       </div>
     </div>
   );
