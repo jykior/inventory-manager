@@ -1,22 +1,15 @@
 import { useState } from "react";
-import { createItem } from "../../api/itemApi";
-import AddCategoryModal from "./AddCategoryModal";
+import { updateItem } from "../../api/itemApi";
 
-function AddItemModal({ categories ,onClose, onItemCreated,onCategoriesChanged }) {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
-  const [currentStock, setCurrentStock] = useState("");
-  const [minStock, setMinStock] = useState("");
-  const [alertEnabled, setAlertEnabled] = useState(true);
+function EditItemModal({ item, categories, onClose, onItemChanged }) {
+  const [name, setName] = useState(item.name);
+  const [category, setCategory] = useState(String(item.category.id));
+  const [currentStock, setCurrentStock] = useState(item.currentStock);
+  const [minStock, setMinStock] = useState(item.minStock);
+  const [alertEnabled, setAlertEnabled] = useState(item.alertEnabled);
   const [error, setError] = useState("");
-  const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
-  const [sortOrder, setSortOrder] = useState("");
-/**
- * 商品を登録する。
- *
- * 入力内容をチェックし、
- * 商品を作成した後に商品一覧を更新する。
- */
+  const [sortOrder, setSortOrder] = useState(item.sortOrder);
+
   const handleSubmit = async () => {
     setError("");
 
@@ -29,17 +22,18 @@ function AddItemModal({ categories ,onClose, onItemCreated,onCategoriesChanged }
       return;
     }
     try {
-      const item = {
+      const updateItemData = {
+        id: item.id,
         name: name.trim(),
         category: { id: Number(category) },
         currentStock: currentStock,
         minStock,
         alertEnabled,
-        sortOrder: sortOrder,
+        sortOrder,
       };
 
-      await createItem(item);
-      await onItemCreated();
+      await updateItem(updateItemData);
+      await onItemChanged();
       onClose();
     } catch (error) {
       if (error.message === "ITEM_FAILED") {
@@ -52,9 +46,11 @@ function AddItemModal({ categories ,onClose, onItemCreated,onCategoriesChanged }
     <div className="modal-overlay">
       <div className="item-modal">
         <div className="item-modal-header">
-          <h2>商品を追加</h2>
+          <h2>商品を編集</h2>
 
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         {error && <p className="form-error">{error}</p>}
@@ -67,14 +63,9 @@ function AddItemModal({ categories ,onClose, onItemCreated,onCategoriesChanged }
             onChange={(e) => setName(e.target.value)}
           />
         </label>
-        <div className="category-add">
-          <label>
-            カテゴリ<span className="required"> *</span>
-          </label>
-          <button type="button" onClick={() => setIsAddCategoryModalOpen(true)}>
-            ＋追加
-          </button>
-        </div>
+        <label>
+          カテゴリ<span className="required"> *</span>
+        </label>
         <select
           className="category-select"
           value={category}
@@ -132,16 +123,8 @@ function AddItemModal({ categories ,onClose, onItemCreated,onCategoriesChanged }
           保存する
         </button>
       </div>
-
-      {/*カテゴリ追加モーダル*/}
-      {isAddCategoryModalOpen && (
-        <AddCategoryModal
-          onClose={() => setIsAddCategoryModalOpen(false)}
-          onCategoryCreated={onCategoriesChanged}
-        />
-      )}
     </div>
   );
 }
 
-export default AddItemModal;
+export default EditItemModal;

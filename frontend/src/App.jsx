@@ -13,7 +13,7 @@ import Setting from "./components/setting/Setting";
 function App() {
   const [allItems, setAllItems] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [currentPage, setCurrentPage] = useState("items");
+  const [currentPage, setCurrentPage] = useState("home");
   const [initialStatus, setInitialStatus] = useState("すべて");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);

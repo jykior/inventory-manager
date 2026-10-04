@@ -50,6 +50,24 @@ export const createCategory = async (category) => {
   return response.json();
 };
 
+export const updateItem = async (item) => {
+  const response = await fetch(`${API_URL}/api/items/${item.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(item),
+  });
+  if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error("ITEM_FAILED");
+    }
+    throw new Error("ITEM_REQUEST_FAILED");
+  }
+  return response.json();
+};
+
 export const updateStock = async (item, newStock) => {
   const response = await fetch(`${API_URL}/api/items/${item.id}/stock`, {
     method: "PATCH",
@@ -58,7 +76,7 @@ export const updateStock = async (item, newStock) => {
     },
     credentials: "include",
     body: JSON.stringify({
-      current_stock: newStock,
+      currentStock: newStock,
     }),
   });
 

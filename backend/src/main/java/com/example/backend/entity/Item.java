@@ -32,7 +32,7 @@ public class Item {
   @JoinColumn(name = "category_id")
   private Category category;
 
-  private Integer current_stock;
+  private Integer currentStock;
 
   private Boolean alertEnabled;
 

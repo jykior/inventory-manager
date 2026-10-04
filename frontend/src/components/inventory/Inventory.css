@@ -237,16 +237,47 @@
   background: #b38d43;
 }
 
-.item-delete {
-  padding: 6px 12px;
-  border: 1px solid #d8bebe;
-  border-radius: 6px;
-  background: #fff8f7;
-  font-size: 20px;
-  cursor: pointer;
+.item-actions,
+.category-actions {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
 }
-.item-delete:hover {
-  background: #f9e8e5;
+
+.item-edit-button,
+.item-delete-button,
+.category-edit-button,
+.category-delete-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.item-edit-button,
+.category-edit-button {
+  border: 1px solid #d6c39d;
+  background: #fffaf0;
+  color: #8f6b28;
+}
+
+.item-edit-button,
+.category-edit-button:hover {
+  background: #f8f1e3;
+}
+
+.item-delete-button,
+.category-delete-button {
+  border: 1px solid #d8bebe;
+  background: #fff8f7;
+  color: #c62828;
+}
+
+.item-delete-button,
+.category-delete-button:hover {
+  background: #fff0ed;
 }
 
 /* カテゴリ管理モーダル */
@@ -327,42 +358,6 @@
 .category-table th:nth-child(4),
 .category-table td:nth-child(4) {
   width: 20%;
-}
-
-.category-actions {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-}
-
-.category-edit-button,
-.category-delete-button {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 15px;
-}
-
-.category-edit-button {
-  border: 1px solid #d6c39d;
-  background: #fffaf0;
-  color: #8f6b28;
-}
-
-.category-edit-button:hover {
-  background: #f8f1e3;
-}
-
-.category-delete-button {
-  border: 1px solid #d8bebe;
-  background: #fff8f7;
-  color: #c62828;
-}
-
-.category-delete-button:hover {
-  background: #fff0ed;
 }
 
 .category-add-button {

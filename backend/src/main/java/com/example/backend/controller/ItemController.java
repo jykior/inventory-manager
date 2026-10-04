@@ -65,7 +65,7 @@ public class ItemController {
   @PatchMapping("/{id}/stock")
   public Item updateStock(@PathVariable Long id, @RequestBody Map<String, Integer> request) {
     try {
-      return itemService.updateStock(id, request.get("current_stock"));
+      return itemService.updateStock(id, request.get("currentStock"));
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }

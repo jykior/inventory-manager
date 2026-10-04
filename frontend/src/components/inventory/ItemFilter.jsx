@@ -28,10 +28,10 @@ function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
 
     // 在庫数並び替え
     if (sortOrder === "desc") {
-      filterItems.sort((a, b) => b.current_stock - a.current_stock);
+      filterItems.sort((a, b) => b.currentStock - a.currentStock);
     }
     if (sortOrder === "asc") {
-      filterItems.sort((a, b) => a.current_stock - b.current_stock);
+      filterItems.sort((a, b) => a.currentStock - b.currentStock);
     }
 
     // 商品名検索

@@ -99,8 +99,10 @@ public class ItemService {
         .orElseThrow(IllegalArgumentException::new);
 
     item.setCategory(category);
-    item.setCurrent_stock(updateItem.getCurrent_stock());
+    item.setCurrentStock(updateItem.getCurrentStock());
+    item.setAlertEnabled(updateItem.getAlertEnabled());
     item.setMinStock(updateItem.getMinStock());
+    item.setSortOrder(updateItem.getSortOrder());
     item.setGuestId(guestId);
 
     return itemRepository.save(item);
@@ -116,7 +118,7 @@ public class ItemService {
     Item item = itemRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
         .orElseThrow(IllegalArgumentException::new);
 
-    item.setCurrent_stock(newStock);
+    item.setCurrentStock(newStock);
 
     return itemRepository.save(item);
   }

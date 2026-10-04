@@ -86,6 +86,7 @@ function Items({
             <ItemCard
               key={item.id}
               item={item}
+              categories={categories}
               isSelected={isSelected === item.id}
               onSelectItem={setIsSelected}
               onUpdateStock={onUpdateStock}

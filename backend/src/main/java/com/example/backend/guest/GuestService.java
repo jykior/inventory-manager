@@ -79,7 +79,7 @@ public class GuestService {
       Item demoItem = new Item();
 
       demoItem.setName(realItem.getName());
-      demoItem.setCurrent_stock(realItem.getCurrent_stock());
+      demoItem.setCurrentStock(realItem.getCurrentStock());
       demoItem.setAlertEnabled(realItem.getAlertEnabled());
       demoItem.setMinStock(realItem.getMinStock());
       demoItem.setSortOrder(realItem.getSortOrder());

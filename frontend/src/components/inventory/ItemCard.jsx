@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { getStockStatus } from "../../utils/stockStatus";
 import { deleteItem, updateStock as updateStockApi } from "../../api/itemApi";
+import EditItemModal from "./EditItemModal";
 
 function ItemCard({
   item,
-  onUpdateStock,
+  categories,
   isSelected,
   onSelectItem,
-  onItemsChanged
+  onUpdateStock,
+  onItemsChanged,
 }) {
   const [stockChange, setStockChange] = useState(0);
   const [isDeleteItemModalOpen, setIsDeleteItemModalOpen] = useState(false);
+  const [isEditItemModalOpen, setIsEditItemModalOpen] = useState(false);
 
   const handleStockChange = async (item, newStock) => {
     const updatedStock = await updateStockApi(item, newStock);
@@ -18,10 +21,10 @@ function ItemCard({
     onUpdateStock(updatedStock);
   };
 
-    const handleDeleteItem = async () => {
+  const handleDeleteItem = async () => {
     await deleteItem(item.id);
     await onItemsChanged();
-    
+
     setIsDeleteItemModalOpen(false);
   };
 
@@ -68,10 +71,10 @@ function ItemCard({
                 onClick={(e) => {
                   e.stopPropagation();
                   setStockChange((prev) =>
-                    Math.max(prev - 1, -item.current_stock),
+                    Math.max(prev - 1, -item.currentStock),
                   );
                 }}
-                disabled={item.current_stock === 0}
+                disabled={item.currentStock === 0}
               >
                 −
               </button>
@@ -83,7 +86,7 @@ function ItemCard({
                   {stockChange}
                 </span>
               )}
-              <span>{item.current_stock}</span>
+              <span>{item.currentStock}</span>
             </span>
             {isSelected && (
               <button
@@ -102,7 +105,7 @@ function ItemCard({
                 onClick={(e) => {
                   e.stopPropagation();
                   if (stockChange !== 0) {
-                    handleStockChange(item, item.current_stock + stockChange);
+                    handleStockChange(item, item.currentStock + stockChange);
                   }
                   setStockChange(0);
                   onSelectItem(null);
@@ -123,18 +126,40 @@ function ItemCard({
 
         <td>
           {isSelected && (
-            <button
-              className="item-delete"
-              onClick={async (e) => {
-                e.stopPropagation();
-                setIsDeleteItemModalOpen(true);
-              }}
-            >
-              🗑
-            </button>
+            <div className="item-actions">
+              <button
+                className="item-edit-button"
+                onClick={() => {
+                  setIsEditItemModalOpen(true);
+                }}
+              >
+                ✎
+              </button>
+              <button
+                className="item-delete-button"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  setIsDeleteItemModalOpen(true);
+                }}
+              >
+                🗑
+              </button>
+            </div>
           )}
         </td>
       </tr>
+      {/*商品編集モーダル*/}
+      {isEditItemModalOpen && (
+        <EditItemModal
+          item={item}
+          categories={categories}
+          onClose={() => {
+            setIsEditItemModalOpen(false);
+          }}
+          onItemChanged={onItemsChanged}
+        />
+      )}
+
       {/* 商品削除確認モーダル */}
       {isDeleteItemModalOpen && (
         <div className="modal-overlay">

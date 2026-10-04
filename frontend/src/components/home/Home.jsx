@@ -97,7 +97,7 @@ function Home({ allItems, setCurrentPage, setInitialStatus }) {
                   </span>
                   <span>{item.name}</span>
                   <span>{item.category.name}</span>
-                  <span>{item.current_stock}個</span>
+                  <span>{item.currentStock}個</span>
                   <span
                     style={{
                       color: status.alertColor,
@@ -133,7 +133,7 @@ function Home({ allItems, setCurrentPage, setInitialStatus }) {
                   </span>
                   <span>{item.name}</span>
                   <span>{item.category.name}</span>
-                  <span>{item.current_stock}個</span>
+                  <span>{item.currentStock}個</span>
                   <span
                     style={{
                       color: status.alertColor,
