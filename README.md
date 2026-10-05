@@ -17,39 +17,15 @@
 そこで、商品の在庫数を簡単に確認・更新でき、
 在庫が少なくなった商品を把握できる在庫管理アプリを制作しました。
 
-# 📝要件定義
-
-## 機能要件
-
-- 商品が登録・編集・削除できること（カテゴリーごとに分類）
-- 在庫数が見られること
-- 商品名で検索できること
-- カテゴリーに分類して見られること
-- 商品ごとに並び替えが好きなように編集できること
-- スタッフが使用した分の在庫を減算登録できること
-- 入庫した分の在庫を加算できること
-- 在庫の数が目安数よりも下回ったら分かるようにすること
-- 在庫数が少ないものをリストとして確認できること
-- 誤操作防止のため、増減操作時に確認ダイアログを表示し在庫数を増減できること
-- ログイン認証により、認証されたユーザーのみ利用できること
-- ゲストログイン機能
-- 設定画面（プロフィール編集・パスワード変更・アラート設定等）
-
-## 非機能要件
-
-- スマホメインで見ることが多いがどんな端末でも崩れず表示できること
-- 操作の慣れていないスタッフでも直観的に操作できること
-- ユーザーの認証情報を安全に管理できること
-- 在庫データを安全に管理できること
-
 ## ⚙️主な機能
 
 - 商品の登録・編集・削除
 - 商品一覧の表示
 - 在庫数の少ない商品の表示
-- カテゴリによる絞り込み
+- カテゴリによる商品の絞り込み
 - 在庫数の増減・更新
 - ユーザー登録とログイン・ログアウト機能
+- ゲストログインでデモデータによるデモ操作
 
 ## 🔧主な使用技術
 
@@ -98,56 +74,165 @@ Spring Securityを利用した認証・認可の仕組みを理解したいと�
 ### 在庫数を直感的に確認できるUI
 
 在庫数だけでなく、在庫状況を視覚的に把握できるように、
-在庫数に応じて表示を変えるUIを実装しました。(黄色は「注意」、赤は「危険」)
+在庫数に応じて表示を変えるUIを実装しました。(黄色は「少ない」、赤は「注意」)
 
 ### 誤操作を防ぐ在庫変更
 
 在庫数を増減する操作では、変更内容を確認してから確定できるようにし、
 誤操作による在庫数の変更を防止しています。
 
-### カテゴリの整理
+<details>
+<summary>👇実装コード</summary>
 
-商品テーブルにカテゴリ情報を直接持たせず、
-カテゴリを別テーブルで管理することで、
-カテゴリごとの色や表示順を一元管理できるようにしました。
+```javascript
+const [stockChange, setStockChange] = useState(0);
+
+const handleStockChange = async (item, newStock) => {
+  const updatedStock = await updateStockApi(item, newStock);
+
+  onUpdateStock(updatedStock);
+};
+// ...
+
+// 在庫を減らす
+setStockChange((prev) => Math.max(prev - 1, -item.currentStock));
+// ...
+
+// 在庫を増やす
+setStockChange((prev) => prev + 1);
+// ...
+
+// 決定ボタンで変更を確定
+if (stockChange !== 0) {
+              handleStockChange(item, item.currentStock + stockChange);
+   }
+// ...
+```
+</details>
+
+### ゲストログイン機能
+
+閲覧するユーザーがすぐにアプリを体験できるよう、 ゲストログイン機能を実装しました。
+
+ゲストログイン時にはゲストユーザーごとにゲストアカウントとデモデータを作成し、
+商品・カテゴリにゲストユーザーIDを紐づけることで、
+複数のゲストユーザーが同時に利用してもデータが干渉しないようにしています。
+
+また、ログアウト時にはゲストユーザーに紐づくデモデータとゲストアカウントを削除し、
+データが残り続けないようにしています。
+
+<details>
+<summary>👇実装コード</summary>
+
+```java
+  public void createDemoData(Long guestId) {
+  Map<Long, Category> categoryMap = createDemoCategories(guestId);
+
+  createDemoItems(categoryMap, guestId);
+}
+
+private Map<Long, Category> createDemoCategories(Long guestId) {
+  // 実際のデータのカテゴリを取得
+  List<Category> realCategories = 
+      categoryRepository.findAllByIsDemoAndGuestId(false, null);
+
+  List<Category> demoCategories = new ArrayList<>();
+  Map<Long, Category> categoryMap = new HashMap<>();
+
+  for (Category realCategory : realCategories) {
+    Category demoCategory = new Category();
+
+    demoCategory.setName(realCategory.getName());
+    demoCategory.setColorCode(realCategory.getColorCode());
+    
+    // ゲストごとのデモデータとして登録
+    demoCategory.setIsDemo(true);
+    demoCategory.setGuestId(guestId);
+
+    demoCategories.add(demoCategory);
+    
+    // 元カテゴリIDとデモカテゴリを対応付け
+    categoryMap.put(realCategory.getId(), demoCategory);
+  }
+  categoryRepository.saveAll(demoCategories);
+  return categoryMap;
+}
+
+private void createDemoItems(Map<Long, Category> categoryMap, Long guestId) {
+  // 実際のデータの商品を取得
+  List<Item> realItems = 
+      itemRepository.findAllByIsDemoAndGuestIdOrderBySortOrderAsc(false, null);
+
+  List<Item> demoItems = new ArrayList<>();
+
+  for (Item realItem : realItems) {
+    Item demoItem = new Item();
+
+    demoItem.setName(realItem.getName());
+    demoItem.setCurrentStock(realItem.getCurrentStock());
+    demoItem.setAlertEnabled(realItem.getAlertEnabled());
+    demoItem.setMinStock(realItem.getMinStock());
+    demoItem.setSortOrder(realItem.getSortOrder());
+    demoItem.setIsDemo(true);
+    demoItem.setGuestId(guestId);
+    
+    // ゲスト用カテゴリに紐付け
+    Category demoCategory = categoryMap.get(realItem.getCategory().getId());
+
+    demoItem.setCategory(demoCategory);
+
+    demoItems.add(demoItem);
+  }
+
+  itemRepository.saveAll(demoItems);
+}
+
+@Transactional
+  public void deleteDemoData() {
+    Long guestId = getCurrentGuestId();
+    
+  // ゲストユーザーに紐づくデモデータを削除
+    itemRepository.deleteAllByIsDemoAndGuestId(true,guestId);
+    categoryRepository.deleteAllByIsDemoAndGuestId(true,guestId);
+    usersRepository.deleteById(guestId);
+  }
+```
+</details>
 
 ## 🚨苦労した点・解決策
 
-### 在庫数の増減処理
+### 画面構成の見直し
 
 #### 【問題】
 
-在庫数の増減操作による誤操作を防ぐため、増減値を一時的に保持し、確認後に在庫数を変更する必要がありました。
-
-#### 【原因】
-
-在庫数を直接変更すると、誤操作によって意図しない在庫数になる可能性がありました。
+はじめは、商品一覧画面のみの構成で設計していましたが、
+商品一覧画面を作り終えて実際に自分で使ってみると、
+在庫が少ない商品状況の確認やユーザー設定などの機能を商品一覧画面だけで管理するよりも、
+画面を分けたほうが使いやすいと感じました。
 
 #### 【解決策】
 
-在庫数変更専用のAPIを用意し、フロントエンドでは増減値を一時的に状態管理する構成にして、確定時に在庫数変更APIへ送信し、バックエンドでデータベースの在庫数を更新するようにしました。
-また、在庫数の変更と商品情報の更新を分けて、それぞれ別の処理として管理しました。
+商品一覧画面だけでなく、ホーム画面・商品一覧・設定・ユーザー管理(adminのみ)の
+4画面に分け、各画面へ移動しやすいようにサイドバーを追加しました。
 
-### Spring Security導入後のエラー処理
+### ゲストログインの設計変更
 
 #### 【問題】
 
-ユーザー登録・ログイン時のエラーを、状況に応じて適切なHTTPステータス（409・401・400）として返すようにしましたが、
-まずメールアドレス重複時に409 Conflictを返す実装をしたところ、実際には403 Forbiddenが返る問題が発生しました。
+はじめは、1つのゲストアカウントを複数のユーザーで共有する設計にしていました。
 
-#### 【原因】
-
-Spring Bootのエラー処理で使用される/errorがSpring Securityの認証対象となっており、エラー処理時に403が返されていました。
+ですが、Web上で公開することを考えると、 複数のユーザーが同時にゲストログインした場合、
+同じデータを操作することでデータが干渉する可能性があると思いました。
 
 #### 【解決策】
 
-/errorをpermitAll()に追加することで、意図したHTTPステータスを返せるようになりました。
-その上で、
-- メールアドレス重複 → 409 Conflict
-- ログイン認証失敗 → 401 Unauthorized 
-- パスワード不一致 → 400 Bad Request
+ゲストログインするたびにゲストアカウントを作成し、 ゲストユーザーごとにデモデータを作成する設計へ変更しました。
 
-としてエラー処理を実装しました。
+商品・カテゴリにゲストユーザーIDを紐づけることで、
+複数のゲストユーザーが同時に利用しても、それぞれ独立したデモデータを操作できるようにしました。
+
+また、ログアウト時にはゲストユーザーと紐づくデモデータを削除することで、
+不要なデータが残らないようにしています。
 
 ## 📱画面構成
 
@@ -195,16 +280,6 @@ Spring Bootのエラー処理で使用される/errorがSpring Securityの認証
 メールアドレスやパスワード、アラート設定を変更できる画面を実装予定です。
 
 ![設定画面]()
-
-### インフラ・デプロイ
-
-#### AWS RDSへの移行
-
-本番環境のデータベースをAWS RDSへ移行予定です。
-
-#### デプロイ
-
-バックエンドをAWS EC2、フロントエンドをNetlifyへデプロイ予定です。
 
 ## 🔵DB設計
 
@@ -285,10 +360,10 @@ erDiagram
 ```
 ###### ※ユーザー設計について
 
-単一店舗での利用を想定しているため、通常の商品・カテゴリは店舗内で共有して管理します。
+単一店舗での利用を想定しているため、商品・カテゴリは店舗内で共有して管理します。
 
 一方、Web上でのデモ利用では複数ユーザーが同時に利用する可能性を考慮し、
-実データをコピーしたデモデータをゲストユーザーごとに分離する機能を実装予定です。
+実際のデータをコピーしたデモデータをゲストユーザーごとに分離しています。
 
 ## 🟢 APIのURL設計
 
@@ -330,63 +405,9 @@ erDiagram
 | POST | `/api/guest/login` | ゲストログイン |
 | POST | `/api/guest/logout` | ゲストログアウト |
 
-## 💻環境構築手順
+### インフラ構成図
 
-### 必要な環境
-
-- Java 21
-- Node.js 24.19.0
-- MySQL 8.0
-- Git
-
-### 1. リポジトリをクローン
-
-```bash
-git clone https://github.com/jykior/inventory-app.git
-```
-
-### 2. データベースを準備
-
-MySQLに `inventory` データベースを作成します。
-
-```sql
-CREATE DATABASE inventory;
-```
-
-テーブルは、アプリケーション起動時にJPAがエンティティ定義をもとに自動作成・更新します。
-
-### 3. バックエンドを起動
-
-バックエンドのディレクトリに移動し、Spring Bootを起動します。
-
-```bash
-cd inventory-app/backend
-```
-
-MySQLの接続情報を環境変数に設定します。
-
-```
-export DB_USERNAME=MySQLのユーザー名
-export DB_PASSWORD=MySQLのパスワード
-```
-
-その後、Spring Bootを起動します。
-
-```
-./gradlew bootRun
-```
-
-### 5. フロントエンドを起動
-
-別のターミナルを開き、フロントエンドのディレクトリで依存関係をインストールし,
-開発サーバーを起動します。
-
-```bash
-cd inventory-app/frontend
-npm install
-npm run dev
-```
-
+![インフラ構成図]()
 ## ⏳開発ステータス
 
 - ✅ 商品登録・削除
@@ -401,7 +422,8 @@ npm run dev
 - ✅ ホーム画面作成
 - ✅ ゲストアカウント作成
 - ✅ ゲストログインの複数人対応
-- ⬜ 商品・カテゴリの編集
+- ✅ 商品・カテゴリの編集
+- ✅ AWS RDSへの移行
+- ✅ デプロイ・公開
 - ⬜ 商品の並び替え
-- ⬜ AWS RDSへの移行
-- ⬜ デプロイ・公開
+- ⬜ メールアドレス・アプリ内通知機能

@@ -13,8 +13,8 @@
 .login-panel {
   position: relative;
   z-index: 1;
-  width: 560px;
-  padding: 40px 50px;
+  width: 500px;
+  padding: 30px 40px;
   box-sizing: border-box;
   background: rgba(20, 20, 20, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.6);
@@ -26,20 +26,20 @@
 
 .login-logo h1 {
   margin: 0;
-  font-size: 42px;
+  font-size: 38px;
   letter-spacing: 5px;
 }
 
 .login-logo h2 {
-  margin: 5px 0 20px;
-  font-size: 30px;
+  margin: 5px 0 15px;
+  font-size: 27px;
   letter-spacing: 6px;
 }
 
 .login-line {
   width: 260px;
   height: 1px;
-  margin: 0 auto 30px;
+  margin: 0 auto 20px;
   background: rgba(220, 170, 80, 0.8);
 }
 
@@ -50,7 +50,7 @@
 }
 
 .login-sub-title {
-  margin: 15px 0 30px;
+  margin: 10px 0 20px;
   font-size: 16px;
 }
 
@@ -58,8 +58,8 @@
 .register-field {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 .login-field label,
@@ -77,8 +77,8 @@
 .login-input {
   display: flex;
   align-items: center;
-  height: 58px;
-  padding: 0 22px;
+  height: 52px;
+  padding: 0 18px;
   box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 14px;
@@ -88,9 +88,9 @@
 }
 
 .login-icon {
-  margin-right: 18px;
+  margin-right: 14px;
   color: #e5ad55;
-  font-size: 26px;
+  font-size: 23px;
 }
 
 .login-input input {
@@ -108,13 +108,13 @@
 
 .login-button {
   width: 100%;
-  height: 58px;
+  height: 52px;
   margin-top: 8px;
   border: none;
   border-radius: 12px;
   background: #dba64f;
   color: #111;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -122,8 +122,8 @@
 .login-divider {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin: 30px 0;
+  gap: 15px;
+  margin: 20px 0;
 }
 
 .login-divider span {
@@ -145,7 +145,7 @@
 .user-register-button,
 .guest-button {
   flex: 1;
-  height: 55px;
+  height: 50px;
   border: 1px solid #dba64f;
   border-radius: 12px;
   background: transparent;

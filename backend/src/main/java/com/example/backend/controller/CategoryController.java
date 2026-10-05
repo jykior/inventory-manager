@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.entity.Category;
 import com.example.backend.service.CategoryService;
 import java.util.List;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,9 +46,9 @@ public class CategoryController {
   }
 
   @PutMapping("/{id}")
-  public Category updateCategory(@PathVariable Long id,@RequestBody Category category){
+  public Category updateCategory(@PathVariable Long id, @RequestBody Category category) {
     try {
-      return categoryService.updateCategory(id,category);
+      return categoryService.updateCategory(id, category);
     } catch (IllegalArgumentException e) {
       if ("CATEGORY_NAME_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -60,7 +61,11 @@ public class CategoryController {
   public void deleteCategory(@PathVariable Long id) {
     try {
       categoryService.deleteCategory(id);
+    } catch (DataIntegrityViolationException e) {
+
+      throw new ResponseStatusException(HttpStatus.CONFLICT);
     } catch (IllegalArgumentException e) {
+
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
   }

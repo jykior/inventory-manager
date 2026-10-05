@@ -20,6 +20,7 @@ public class CategoryService {
   private final CategoryRepository categoryRepository;
   private final GuestService guestService;
 
+  // 現在のログインユーザーがゲストか判定する
   private boolean isGuest() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -94,7 +95,9 @@ public class CategoryService {
     if (isDemo) {
       guestId = guestService.getCurrentGuestId();
     }
-    Category category = categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId).orElseThrow(IllegalArgumentException::new);
+    Category category =
+        categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
+            .orElseThrow(IllegalArgumentException::new);
 
     categoryRepository.delete(category);
   }

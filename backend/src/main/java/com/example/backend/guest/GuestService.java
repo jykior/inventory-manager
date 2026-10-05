@@ -28,34 +28,39 @@ public class GuestService {
   public Users guestLogin() {
     Users guest = new Users();
 
-    guest.setEmail("guest"+ UUID.randomUUID()+"@example.com");
+    guest.setEmail("guest" + UUID.randomUUID() + "@example.com");
     guest.setRole("GUEST");
 
     guest = usersRepository.save(guest);
 
-    guest.setNickName("ゲスト"+guest.getId());
+    guest.setNickName("ゲスト" + guest.getId());
 
     return guest;
   }
 
-  public Long getCurrentGuestId(){
+  public Long getCurrentGuestId() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
     String email = authentication.getName();
 
-    Users guest =usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("GUEST_NOT_FOUND"));
+    Users guest = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("GUEST_NOT_FOUND"));
 
     return guest.getId();
   }
 
   public void createDemoData(Long guestId) {
-    List<Category> realCategories = categoryRepository.findAllByIsDemoAndGuestId(false,null);
+    Map<Long, Category> categoryMap = createDemoCategories(guestId);
+
+    createDemoItems(categoryMap, guestId);
+  }
+
+  private Map<Long, Category> createDemoCategories(Long guestId) {
+    List<Category> realCategories = categoryRepository.findAllByIsDemoAndGuestId(false, null);
 
     List<Category> demoCategories = new ArrayList<>();
     Map<Long, Category> categoryMap = new HashMap<>();
 
     for (Category realCategory : realCategories) {
-
       Category demoCategory = new Category();
 
       demoCategory.setName(realCategory.getName());
@@ -67,11 +72,11 @@ public class GuestService {
       categoryMap.put(realCategory.getId(), demoCategory);
     }
     categoryRepository.saveAll(demoCategories);
-    copyItems(categoryMap,guestId);
+    return categoryMap;
   }
 
-  public List<Item> copyItems(Map<Long, Category> categoryMap,Long guestId) {
-    List<Item> realItems = itemRepository.findAllByIsDemoAndGuestIdOrderBySortOrderAsc(false,null);
+  private void createDemoItems(Map<Long, Category> categoryMap, Long guestId) {
+    List<Item> realItems = itemRepository.findAllByIsDemoAndGuestIdOrderBySortOrderAsc(false, null);
 
     List<Item> demoItems = new ArrayList<>();
 
@@ -93,15 +98,15 @@ public class GuestService {
       demoItems.add(demoItem);
     }
 
-    return itemRepository.saveAll(demoItems);
+    itemRepository.saveAll(demoItems);
   }
 
   @Transactional
   public void deleteDemoData() {
     Long guestId = getCurrentGuestId();
 
-    itemRepository.deleteAllByIsDemoAndGuestId(true,guestId);
-    categoryRepository.deleteAllByIsDemoAndGuestId(true,guestId);
+    itemRepository.deleteAllByIsDemoAndGuestId(true, guestId);
+    categoryRepository.deleteAllByIsDemoAndGuestId(true, guestId);
     usersRepository.deleteById(guestId);
   }
 

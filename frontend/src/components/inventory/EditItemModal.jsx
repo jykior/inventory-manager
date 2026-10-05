@@ -9,7 +9,12 @@ function EditItemModal({ item, categories, onClose, onItemChanged }) {
   const [alertEnabled, setAlertEnabled] = useState(item.alertEnabled);
   const [error, setError] = useState("");
   const [sortOrder, setSortOrder] = useState(item.sortOrder);
-
+/**
+ * 商品情報を更新する。
+ *
+ * 入力内容をチェックし、
+ * 商品を更新した後に商品一覧を更新する。
+ */
   const handleSubmit = async () => {
     setError("");
 

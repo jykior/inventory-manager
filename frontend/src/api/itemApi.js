@@ -113,4 +113,9 @@ export const deleteCategory = async (id) => {
     method: "DELETE",
     credentials: "include",
   });
+  if (!response.ok) {
+    if (response.status === 409) {
+      throw new Error("CATEGORY_HAS_ITEMS");
+    }
+  }
 };

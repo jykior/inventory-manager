@@ -250,7 +250,6 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
             <select className="setting-alert">
               <option value="">アプリ内通知</option>
               <option value="">メール通知</option>
-              <option value="">アプリ・メール通知</option>
             </select>
           </div>
 

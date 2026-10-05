@@ -9,12 +9,7 @@ function Login({ onLogin }) {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
   const [showUserRegister, setShowUserRegister] = useState(false);
-  /**
-   * ログイン処理を行う。
-   *
-   * 入力内容をチェックし、
-   * ログインした後にログイン情報をApp.jsxへ渡す。
-   */
+
   const showMessage = (text, type) => {
     setMessage({ text: text, type: type });
 
@@ -22,8 +17,13 @@ function Login({ onLogin }) {
       setMessage({ text: "", type: "" });
     }, 5000);
   };
-
-  const handleSubmit = async (e) => {
+  /**
+   * ログイン処理を行う。
+   *
+   * 入力内容をチェックし、
+   * ログインした後にログイン情報をApp.jsxへ渡す。
+   */
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!email.trim()) {
@@ -89,7 +89,7 @@ function Login({ onLogin }) {
 
         <p className="login-sub-title">在庫状況をいつでも正確に。</p>
 
-        <form onSubmit={handleSubmit} noValidate>
+        <form onSubmit={handleLogin} noValidate>
           <div className="login-field">
             <label>
               <span className="login-text">メールアドレス</span>

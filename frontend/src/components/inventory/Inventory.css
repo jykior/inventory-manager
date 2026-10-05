@@ -123,7 +123,7 @@
 
 .item-table th,
 .item-table td {
-  padding: 18px 24px;
+  padding: 10px 24px;
   text-align: center;
   border-bottom: 1px solid #ddd6c8;
 }
@@ -137,7 +137,7 @@
 
 .item-table td {
   font-size: 15px;
-  height: 58px;
+  height: 40px;
 }
 
 .item-table th:nth-child(1),
@@ -157,7 +157,7 @@
 
 .item-table th:nth-child(4),
 .item-table td:nth-child(4) {
-  width: 35%;
+  width: 30%;
 }
 
 .item-table th:nth-child(5),
@@ -167,12 +167,12 @@
 
 .item-table th:nth-child(6),
 .item-table td:nth-child(6) {
-  width: 10%;
+  width: 15%;
 }
-
+/*商品カード*/
 .item-name {
   font-weight: bold;
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .item-category {
@@ -241,19 +241,31 @@
 .category-actions {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 6px;
 }
 
 .item-edit-button,
 .item-delete-button,
+.item-stock-in-button,
 .category-edit-button,
 .category-delete-button {
-  width: 32px;
+  width: 42px;
   height: 32px;
   padding: 0;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 14px;
+}
+
+.item-stock-in-button {
+  border: 1px solid #9bb8a0;
+  background: #f3f8f3;
+  color: #557b5d;
+}
+
+.item-stock-in-button:hover {
+  background: #e5f0e6;
 }
 
 .item-edit-button,
@@ -602,4 +614,109 @@
 
 .delete-confirm-button:hover {
   background: #fff0ed !important;
+}
+
+/* 商品入庫モーダル */
+
+.stock-in-modal {
+  width: 100%;
+  max-width: 420px;
+  background: #fffdf8;
+  border-radius: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.stock-in-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.stock-in-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #2a2a2a;
+}
+
+.stock-in-info {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background: #f8f4eb;
+  border-radius: 10px;
+}
+
+.stock-in-info p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.stock-in-label {
+  display: block;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.stock-in-label input {
+  display: block;
+  width: 100%;
+  height: 44px;
+  margin-top: 8px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: 1px solid #d6c39d;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 15px;
+  outline: none;
+}
+
+.stock-in-label input:focus {
+  border-color: #c9a45c;
+}
+
+.stock-in-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.stock-in-cancel-button,
+.stock-in-confirm-button {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.stock-in-cancel-button {
+  border: 1px solid #d6c39d;
+  background: #fff;
+  color: #555;
+}
+
+.stock-in-cancel-button:hover {
+  background: #f8f1e3;
+}
+
+.stock-in-confirm-button {
+  border: 1px solid #c9a45c;
+  background: #c9a45c;
+  color: #fff;
+}
+
+.stock-in-confirm-button:hover {
+  background: #b38d43;
+}
+
+.stock-in-confirm-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

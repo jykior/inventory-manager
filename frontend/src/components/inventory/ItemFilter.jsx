@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { getStockStatus } from "../../utils/stockStatus";
-
+/**
+ * 商品一覧のカテゴリ・状態・在庫数による絞り込み、
+ * 商品名検索、並び替えを行う。
+ */
 function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
   const [selectedCategory, setSelectedCategory] = useState("すべて");
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
@@ -26,7 +29,29 @@ function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
       });
     }
 
-    // 在庫数並び替え
+    // 並び替え
+    if (sortOrder === "default") {
+      filterItems.sort((a, b) => {
+        //  カテゴリID順
+        const categoryIdA = a.category?.id ?? Number.MAX_SAFE_INTEGER;
+        const categoryIdB = b.category?.id ?? Number.MAX_SAFE_INTEGER;
+
+        if (categoryIdA !== categoryIdB) {
+          return categoryIdA - categoryIdB;
+        }
+
+        // 同じカテゴリ内では商品sortOrder順
+        const itemSortOrderA = a.sortOrder ?? Number.MAX_SAFE_INTEGER;
+        const itemSortOrderB = b.sortOrder ?? Number.MAX_SAFE_INTEGER;
+
+        if (itemSortOrderA !== itemSortOrderB) {
+          return itemSortOrderA - itemSortOrderB;
+        }
+        // sortOrderが同じ場合は商品ID順
+        return a.id - b.id;
+      });
+    }
+
     if (sortOrder === "desc") {
       filterItems.sort((a, b) => b.currentStock - a.currentStock);
     }
@@ -86,7 +111,7 @@ function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
       </select>
 
       <select value={sortOrder} onChange={handleSortChange}>
-        <option value="default">並び順(標準)</option>
+        <option value="default">カテゴリ順</option>
         <option value="desc">在庫が多い順</option>
         <option value="asc">在庫が少ない順</option>
       </select>

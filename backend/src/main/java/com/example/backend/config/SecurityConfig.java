@@ -95,7 +95,7 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
 
-    configuration.setAllowedOrigins(List.of("http://localhost:5173", "https://inventorymanager-test.netlify.app"));
+    configuration.setAllowedOrigins(List.of("http://localhost:5173", "https://inventory-manager-pf.netlify.app"));
 
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 

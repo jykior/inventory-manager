@@ -6,12 +6,7 @@ import "./Admin.css";
 function Admin() {
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState({ text: "", type: "" });
-  /**
-   * ユーザーの権限を変更する。
-   *
-   * 権限を更新した後、
-   * usersのstateに変更内容を反映する。
-   */
+
   const showMessage = (text, type) => {
     setMessage({ text: text, type: type });
 
@@ -19,7 +14,12 @@ function Admin() {
       setMessage({ text: "", type: "" });
     }, 5000);
   };
-
+  /**
+   * ユーザーの権限を変更する。
+   *
+   * 権限を更新した後、
+   * usersのstateに変更内容を反映する。
+   */
   const handleRoleChange = async (id, role) => {
     try {
       await updateUserRole(id, role);

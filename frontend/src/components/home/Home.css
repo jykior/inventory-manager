@@ -1,6 +1,6 @@
 .home-summary {
   display: flex;
-  gap: 20px;
+  gap: 16px;
 }
 
 .home-summary > div {
@@ -12,12 +12,12 @@
 
 .summary-card {
   flex: 1;
-  min-height: 120px;
-  padding: 25px;
+  min-height: 100px;
+  padding: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 14px;
   background: white;
   border-radius: 10px;
   border: 1px solid #eee8df;
@@ -25,14 +25,14 @@
 }
 
 .icon {
-  width: 58px;
-  height: 58px;
+  width: 50px;
+  height: 50px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 500;
   transform: translateX(-30px);
   background: color-mix(in srgb, currentColor 10%, white);
@@ -48,10 +48,10 @@
 }
 
 .summary-text p {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: bold;
   text-align: center;
-  padding: 5px 10px;
+  padding: 4px 8px;
   border-radius: 15%;
   background: color-mix(in srgb, currentColor 10%, white);
   border: 1px solid color-mix(in srgb, currentColor 25%, white);
@@ -61,18 +61,18 @@
 .summary-number {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 6px;
+  margin-top: 8px;
 }
 
 .summary-number h2 {
   margin: 0;
-  font-size: 42px;
+  font-size: 36px;
   font-weight: 500;
 }
 
 .summary-number span {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .home-stock-list {
@@ -83,8 +83,8 @@
 
 .home-alert,
 .home-few {
-  margin-top: 30px;
-  padding: 30px;
+  margin-top: 24px;
+  padding: 24px;
   background: white;
   border-radius: 12px;
   border: 1px solid #e8e2d8;
@@ -93,8 +93,8 @@
 
 .home-alert h2,
 .home-few h2 {
-  margin: 0 0 20px;
-  font-size: 24px;
+  margin: 0 0 16px;
+  font-size: 21px;
   font-weight: bold;
   letter-spacing: 0.05em;
 }
@@ -104,21 +104,21 @@
   display: grid;
   grid-template-columns: 0.2fr 1.5fr 1.5fr 1fr 1fr;
   align-items: center;
-  padding: 20px 5px;
+  padding: 16px 5px;
   border-bottom: 1px solid #eee;
-  font-size: 18px;
+  font-size: 16px;
   white-space: nowrap;
 }
 
 .home-stock-list button {
   width: 100%;
-  padding: 14px;
-  margin-top: 20px;
+  padding: 11px;
+  margin-top: 16px;
   background: #fff;
   border: 1px solid #c79a45;
   border-radius: 6px;
   color: #b07d18;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
   transition: 0.2s;
 }
