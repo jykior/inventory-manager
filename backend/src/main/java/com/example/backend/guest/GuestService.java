@@ -33,7 +33,7 @@ public class GuestService {
 
     guest = usersRepository.save(guest);
 
-    guest.setNickName("ゲスト" + guest.getId());
+    guest.setNickname("ゲスト" + guest.getId());
 
     return guest;
   }

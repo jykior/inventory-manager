@@ -9,4 +9,5 @@ public class AccountUpdateRequest {
 
   private String email;
   private String password;
+  private String nickname;
 }

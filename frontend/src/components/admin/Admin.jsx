@@ -62,7 +62,7 @@ function Admin() {
         <tbody>
           {users.map((user) => (
             <tr key={user.id}>
-              <td>・ {user.nickName}</td>
+              <td>・ {user.nickname}</td>
 
               <td>
                 {user.role === "ADMIN" ? (

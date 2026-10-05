@@ -67,7 +67,7 @@ public class UsersController {
       return new UserResponse(
           users.getId(),
           users.getEmail(),
-          users.getNickName(),
+          users.getNickname(),
           users.getRole());
     } catch (AuthenticationException e) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
@@ -82,23 +82,11 @@ public class UsersController {
       return new UserResponse(
           users.getId(),
           users.getEmail(),
-          users.getNickName(),
+          users.getNickname(),
           users.getRole()
       );
     } catch (IllegalArgumentException e) {
       if ("EMAIL_ALREADY_EXISTS".equals(e.getMessage())) {
-        throw new ResponseStatusException(HttpStatus.CONFLICT);
-      }
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @PatchMapping("/{id}/role")
-  public void updateRole(@PathVariable Long id, @RequestBody RoleRequest request) {
-    try {
-      usersService.updateRole(id, request.getRole());
-    } catch (IllegalArgumentException e) {
-      if ("ADMIN_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
       }
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -137,7 +125,7 @@ public class UsersController {
       return new UserResponse(
           users.getId(),
           users.getEmail(),
-          users.getNickName(),
+          users.getNickname(),
           users.getRole()
       );
     } catch (IllegalArgumentException e) {
@@ -149,11 +137,43 @@ public class UsersController {
   }
 
   @PatchMapping("/password")
-  public void updatePassword(Authentication authentication, @RequestBody AccountUpdateRequest request) {
+  public void updatePassword(
+      @RequestBody AccountUpdateRequest request,
+      Authentication authentication) {
     try {
       usersService.updatePassword(authentication.getName(), request.getPassword());
     } catch (IllegalArgumentException e) {
       if ("SAME_PASSWORD".equals(e.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT);
+      }
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @PatchMapping("/nickname")
+  public UserResponse updateNickname(
+      @RequestBody AccountUpdateRequest request,
+      Authentication authentication) {
+
+    Users users = usersService.updateNickname(
+        authentication.getName(),
+        request.getNickname()
+    );
+
+    return new UserResponse(
+        users.getId(),
+        users.getEmail(),
+        users.getNickname(),
+        users.getRole()
+    );
+  }
+
+  @PatchMapping("/{id}/role")
+  public void updateRole(@PathVariable Long id, @RequestBody RoleRequest request) {
+    try {
+      usersService.updateRole(id, request.getRole());
+    } catch (IllegalArgumentException e) {
+      if ("ADMIN_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
       }
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);

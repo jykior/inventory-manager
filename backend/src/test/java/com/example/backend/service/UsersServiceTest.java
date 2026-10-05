@@ -46,7 +46,7 @@ class UsersServiceTest {
     request.setEmail("test@example.com");
     request.setPassword("password");
     request.setConfirmPassword("password");
-    request.setNickName("凡人");
+    request.setNickname("凡人");
 
     when(usersRepository.existsByEmail("test@example.com"))
         .thenReturn(false);
@@ -74,6 +74,6 @@ class UsersServiceTest {
 
     assertEquals("test@example.com", savedUser.getEmail());
     assertEquals("hashedPassword", savedUser.getPasswordHash());
-    assertEquals("凡人", savedUser.getNickName());
+    assertEquals("凡人", savedUser.getNickname());
   }
 }

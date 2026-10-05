@@ -110,7 +110,7 @@ function App() {
             <div className="user-avatar">
               <User size={24} />
             </div>
-            <span className="user-name">{user?.nickName}</span>
+            <span className="user-name">{user?.nickname}</span>
             <button className="logout-button" onClick={handleLogout}>
               ログアウト
             </button>

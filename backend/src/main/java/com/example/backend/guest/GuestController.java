@@ -54,7 +54,7 @@ public class GuestController {
       return new UserResponse(
           guest.getId(),
           guest.getEmail(),
-          guest.getNickName(),
+          guest.getNickname(),
           guest.getRole()
       );
     } catch (IllegalArgumentException e) {

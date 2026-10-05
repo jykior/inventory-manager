@@ -30,5 +30,5 @@ public class Users {
 
   private String role;
 
-  private String nickName;
+  private String nickname;
 }

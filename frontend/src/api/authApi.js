@@ -47,13 +47,13 @@ export const userRegister = async (
   email,
   password,
   confirmPassword,
-  nickName,
+  nickname,
 ) => {
   const response = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ email, password, confirmPassword, nickName }),
+    body: JSON.stringify({ email, password, confirmPassword, nickname }),
   });
 
   if (!response.ok) {
@@ -125,6 +125,23 @@ export const updatePassword = async (password) => {
     }
     throw new Error("UPDATE_PASSWORD_FAILED");
   }
+};
+
+export const updateNickname = async (nickname) => {
+  const response = await fetch(`${API_URL}/api/auth/nickname`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ nickname }),
+  });
+
+  if (!response.ok) {
+    throw new Error("NICKNAME_UPDATE_FAILED");
+  }
+
+  return await response.json();
 };
 
 export const deleteAccount = async () => {

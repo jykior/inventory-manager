@@ -53,8 +53,15 @@ public class SecurityConfig {
         .securityContext(context -> context.securityContextRepository(securityContextRepository()))
         .authenticationProvider(authenticationProvider)
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/login", "/api/auth/register", "/api/guest/login", "/error","/health").permitAll()
+            .requestMatchers(
+                "/api/auth/login",
+                "/api/auth/register",
+                "/api/guest/login",
+                "/error",
+                "/health"
+            ).permitAll()
             .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
+
             // 商品・カテゴリ操作
             .requestMatchers(HttpMethod.GET, "/api/items", "/api/categories")
             .hasAnyRole("ADMIN", "MANAGER", "STAFF", "GUEST")
@@ -76,8 +83,8 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.PATCH, "/api/auth/*/role")
             .hasAnyRole("ADMIN")
 
-            // メールアドレス変更
-            .requestMatchers(HttpMethod.PATCH, "/api/auth/email")
+            // メールアドレス・パスワード・ニックネーム変更
+            .requestMatchers(HttpMethod.PATCH, "/api/auth/email", "/api/auth/password", "/api/auth/nickname")
             .hasAnyRole("ADMIN", "MANAGER", "STAFF", "GUEST")
 
             .anyRequest()

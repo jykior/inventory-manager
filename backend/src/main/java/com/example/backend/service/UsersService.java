@@ -42,6 +42,26 @@ public class UsersService {
     usersRepository.delete(users);
   }
 
+  public Users register(RegisterRequest request) {
+    if (usersRepository.existsByEmail(request.getEmail())) {
+      throw new IllegalArgumentException("EMAIL_ALREADY_EXISTS");
+    }
+    if (!request.getPassword().equals(request.getConfirmPassword())) {
+      throw new IllegalArgumentException();
+    }
+    Users users = new Users();
+
+    users.setEmail(request.getEmail());
+
+    users.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+
+    users.setRole("STAFF");
+
+    users.setNickname(request.getNickname());
+
+    return usersRepository.save(users);
+  }
+
   public Users updateEmail(String currentEmail, String newEmail) {
     if (usersRepository.existsByEmail(newEmail)) {
       throw new IllegalArgumentException("EMAIL_ALREADY_EXISTS");
@@ -64,22 +84,10 @@ public class UsersService {
     usersRepository.save(users);
   }
 
-  public Users register(RegisterRequest request) {
-    if (usersRepository.existsByEmail(request.getEmail())) {
-      throw new IllegalArgumentException("EMAIL_ALREADY_EXISTS");
-    }
-    if (!request.getPassword().equals(request.getConfirmPassword())) {
-      throw new IllegalArgumentException();
-    }
-    Users users = new Users();
+  public Users updateNickname(String email, String nickname) {
+    Users users = usersRepository.findByEmail(email).orElseThrow();
 
-    users.setEmail(request.getEmail());
-
-    users.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-
-    users.setRole("STAFF");
-
-    users.setNickName(request.getNickName());
+    users.setNickname(nickname);
 
     return usersRepository.save(users);
   }
@@ -104,7 +112,7 @@ public class UsersService {
         .map(users -> new UserResponse(
             users.getId(),
             users.getEmail(),
-            users.getNickName(),
+            users.getNickname(),
             users.getRole()
         )).toList();
   }

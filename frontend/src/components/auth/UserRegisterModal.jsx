@@ -5,7 +5,7 @@ import { Mail, KeyRound, User, BadgeCheck } from "lucide-react";
 const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [nickName, setNickName] = useState("");
+  const [nickname, setNickname] = useState("");
   const [message, setMessage] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   /**
@@ -15,7 +15,7 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
    * ユーザーを登録した後にモーダルを閉じる。
    */
   const handleRegister = async () => {
-    if (!nickName || !email || !password || !confirmPassword) {
+    if (!nickname || !email || !password || !confirmPassword) {
       setMessage("未入力の項目があります");
       return;
     }
@@ -34,7 +34,7 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
       return;
     }
     try {
-      await userRegister(email, password, confirmPassword, nickName);
+      await userRegister(email, password, confirmPassword, nickname);
       onRegisterSuccess();
       onClose();
     } catch (error) {
@@ -121,8 +121,8 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
             <input
               type="text"
               placeholder="ニックネーム"
-              value={nickName}
-              onChange={(e) => setNickName(e.target.value)}
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
             />
           </div>
         </div>

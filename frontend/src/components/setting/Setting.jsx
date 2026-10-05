@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { deleteAccount, updateEmail, updatePassword } from "../../api/authApi";
+import {
+  deleteAccount,
+  updateEmail,
+  updatePassword,
+  updateNickname,
+} from "../../api/authApi";
 import { Megaphone, UserPen, Settings } from "lucide-react";
 import "./Setting.css";
 
@@ -8,8 +13,10 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
     useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [nickname, setNickname] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
 
@@ -46,11 +53,7 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
       showMessage("メールアドレスの変更に失敗しました", "error");
     }
   };
-  /**
-   * パスワード変更を行う。
-   *
-   * 入力内容をチェックし、パスワードを変更した後にモーダルを閉じる。
-   */
+
   const handleUpdatePassword = async () => {
     if (!password || !confirmPassword) {
       showMessage("未入力の項目があります", "error");
@@ -79,6 +82,24 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
       }
 
       showMessage("パスワードの変更に失敗しました", "error");
+    }
+  };
+
+  const handleUpdateNickname = async () => {
+    if (!nickname.trim()) {
+      showMessage("ニックネームを入力してください", "error");
+      return;
+    }
+
+    try {
+      const updatedUser = await updateNickname(nickname.trim());
+      onUserUpdated(updatedUser);
+      setNickname("");
+      setIsNicknameModalOpen(false);
+
+      showMessage("ニックネームを変更しました", "success");
+    } catch (error) {
+      showMessage("ニックネームの変更に失敗しました", "error");
     }
   };
 
@@ -124,6 +145,19 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
             <span className="setting-label">パスワード</span>
             <span className="setting-value">********</span>
             <button onClick={() => setIsPasswordModalOpen(true)}>編集</button>
+          </div>
+
+          <div className="setting-item">
+            <span className="setting-label">ニックネーム</span>
+            <span className="setting-value">{user?.nickname}</span>
+            <button
+              onClick={() => {
+                setNickname(user?.nickname || "");
+                setIsNicknameModalOpen(true);
+              }}
+            >
+              編集
+            </button>
           </div>
 
           <div className="setting-item account-delete">
@@ -210,6 +244,44 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
                   <button
                     className="save-button"
                     onClick={handleUpdatePassword}
+                  >
+                    保存
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isNicknameModalOpen && (
+            <div className="modal-overlay">
+              <div className="account-modal">
+                <h3>ニックネーム変更</h3>
+
+                <p>新しいニックネーム</p>
+
+                <input
+                  type="text"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                />
+
+                {message.type === "error" && (
+                  <p className="password-message">{message.text}</p>
+                )}
+
+                <div className="account-modal-buttons">
+                  <button
+                    onClick={() => {
+                      setNickname("");
+                      setIsNicknameModalOpen(false);
+                    }}
+                  >
+                    キャンセル
+                  </button>
+
+                  <button
+                    className="save-button"
+                    onClick={handleUpdateNickname}
                   >
                     保存
                   </button>
