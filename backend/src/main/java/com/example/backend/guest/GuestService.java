@@ -7,6 +7,7 @@ import com.example.backend.repository.CategoryRepository;
 import com.example.backend.repository.ItemRepository;
 import com.example.backend.repository.UsersRepository;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+/**
+ * ゲストユーザーの作成やデモデータの管理を行うサービスクラス。
+ */
 @Service
 @RequiredArgsConstructor
 public class GuestService {
@@ -30,6 +33,7 @@ public class GuestService {
 
     guest.setEmail("guest" + UUID.randomUUID() + "@example.com");
     guest.setRole("GUEST");
+    guest.setLastAccessedAt(LocalDateTime.now());
 
     guest = usersRepository.save(guest);
 
@@ -43,9 +47,29 @@ public class GuestService {
 
     String email = authentication.getName();
 
-    Users guest = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("GUEST_NOT_FOUND"));
+    return usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("GUEST_NOT_FOUND")).getId();
+  }
+  /**
+   * ゲストの最終アクセス日時を更新する。
+   *
+   * @return ゲストが存在して更新できた場合はtrue、存在しない場合はfalse
+   */
+  public boolean  updateLastAccessedAt() {
+    Authentication authentication =
+        SecurityContextHolder.getContext().getAuthentication();
 
-    return guest.getId();
+    String email = authentication.getName();
+
+    Users guest = usersRepository.findByEmail(email).orElse(null);
+
+    if (guest == null) {
+      return false;
+    }
+    guest.setLastAccessedAt(LocalDateTime.now());
+
+    usersRepository.save(guest);
+
+    return true;
   }
 
   public void createDemoData(Long guestId) {
@@ -105,6 +129,23 @@ public class GuestService {
   public void deleteDemoData() {
     Long guestId = getCurrentGuestId();
 
+    deleteDemoData(guestId);
+  }
+
+  @Transactional
+  public void cleanupExpiredGuest() {
+    LocalDateTime threshold = LocalDateTime.now().minusMinutes(30);
+
+    List<Users> expiredGuest =
+        usersRepository.findByRoleAndLastAccessedAtBefore("GUEST", threshold);
+
+    for (Users guest : expiredGuest) {
+      deleteDemoData(guest.getId());
+    }
+  }
+
+  @Transactional
+  public void deleteDemoData(Long guestId) {
     itemRepository.deleteAllByIsDemoAndGuestId(true, guestId);
     categoryRepository.deleteAllByIsDemoAndGuestId(true, guestId);
     usersRepository.deleteById(guestId);

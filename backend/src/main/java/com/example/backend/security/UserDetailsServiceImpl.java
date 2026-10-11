@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * Spring Securityのユーザー情報を提供するサービスクラス。
+ * Spring Securityの認証に使用するユーザー情報を提供するサービスクラス。
  */
 @Service
 @RequiredArgsConstructor

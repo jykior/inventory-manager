@@ -72,6 +72,7 @@ function App() {
     sessionStorage.removeItem("user");
     setUser(null);
     setIsLoggedIn(false);
+    setCurrentPage("home");
   };
 
   const handleUserUpdated = (updatedUser) => {

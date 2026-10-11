@@ -20,7 +20,9 @@ public class CategoryService {
   private final CategoryRepository categoryRepository;
   private final GuestService guestService;
 
-  // 現在のログインユーザーがゲストか判定する
+  /**
+   * 現在のログインユーザーがゲストか判定する
+    */
   private boolean isGuest() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

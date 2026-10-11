@@ -2,7 +2,9 @@ package com.example.backend.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;
-
+/**
+ * ユーザー情報を返すレスポンスDTO。
+ */
 @Getter
 @Setter
 

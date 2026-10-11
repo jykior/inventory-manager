@@ -101,10 +101,7 @@ public class UsersController {
       HttpServletResponse httpServletResponse) {
 
     try {
-      Users users = usersService.updateEmail(
-          authentication.getName(),
-          request.getEmail()
-      );
+      Users users = usersService.updateEmail(authentication.getName(), request.getEmail());
 
       Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
           users.getEmail(),

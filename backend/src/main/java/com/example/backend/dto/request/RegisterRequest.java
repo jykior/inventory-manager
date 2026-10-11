@@ -2,7 +2,9 @@ package com.example.backend.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
-
+/**
+ * ユーザー登録時に使用するリクエストDTO。
+ */
 @Getter
 @Setter
 public class RegisterRequest {
