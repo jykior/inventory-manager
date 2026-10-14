@@ -41,7 +41,11 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
-
+      - name: Check GitHub OIDC subject
+        if: github.event_name == 'push'
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Ref: $GITHUB_REF"
       - name: Configure AWS credentials
         if: github.event_name == 'push'
         uses: aws-actions/configure-aws-credentials@v4
