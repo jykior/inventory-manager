@@ -1,4 +1,4 @@
-name: Backend Build and Test
+name: Backend Build and Deploy
 
 on:
   push:
@@ -14,8 +14,12 @@ on:
       - 'backend/**'
       - '.github/workflows/deploy.yml'
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     defaults:
@@ -35,5 +39,84 @@ jobs:
       - name: Grant execute permission to Gradle Wrapper
         run: chmod +x gradlew
 
-      - name: Build and test with Gradle
+      - name: Build with Gradle
         run: ./gradlew build
+
+      - name: Configure AWS credentials
+        if: github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::045861054138:role/GitHubActionsDeployRole
+          aws-region: ap-northeast-1
+
+      - name: Upload JAR to S3
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          JAR_FILE=$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-plain.jar' | head -n 1)
+          test -n "$JAR_FILE"
+          aws s3 cp "$JAR_FILE" \
+            s3://inventory-manager-deploy/backend/backend-0.0.1-SNAPSHOT.jar
+
+      - name: Deploy to EC2 via SSM
+        if: github.event_name == 'push'
+        env:
+          AWS_REGION: ap-northeast-1
+          INSTANCE_ID: i-0c4b0c648aee83194
+        working-directory: .
+        shell: bash
+        run: |
+          set -euo pipefail
+          
+          COMMAND_ID=$(aws ssm send-command \
+            --region "$AWS_REGION" \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy backend from GitHub Actions" \
+            --parameters 'commands=[
+              "set -e",
+              "JAR=/home/ec2-user/backend-0.0.1-SNAPSHOT.jar",
+              "NEW_JAR=/home/ec2-user/backend-0.0.1-SNAPSHOT.jar.new",
+              "OLD_JAR=/home/ec2-user/backend-0.0.1-SNAPSHOT.jar.rollback",
+              "aws s3 cp s3://inventory-manager-deploy/backend/backend-0.0.1-SNAPSHOT.jar \"$NEW_JAR\" --region ap-northeast-1",
+              "test -s \"$NEW_JAR\"",
+              "sudo chown ec2-user:ec2-user \"$NEW_JAR\"",
+              "if [ -f \"$JAR\" ]; then cp \"$JAR\" \"$OLD_JAR\"; fi",
+              "mv \"$NEW_JAR\" \"$JAR\"",
+              "if sudo systemctl restart inventory-backend.service && sleep 5 && sudo systemctl is-active --quiet inventory-backend.service; then rm -f \"$OLD_JAR\"; echo Deploy succeeded; else echo Deploy failed; if [ -f \"$OLD_JAR\" ]; then mv \"$OLD_JAR\" \"$JAR\"; sudo systemctl restart inventory-backend.service; fi; exit 1; fi"
+            ]' \
+            --query 'Command.CommandId' \
+            --output text)
+          
+          echo "SSM Command ID: $COMMAND_ID"
+          
+          for attempt in $(seq 1 30); do
+            STATUS=$(aws ssm get-command-invocation \
+              --region "$AWS_REGION" \
+              --command-id "$COMMAND_ID" \
+              --instance-id "$INSTANCE_ID" \
+              --query 'Status' \
+              --output text 2>/dev/null || true)
+          
+            case "$STATUS" in
+              Success)
+                echo "Deployment succeeded."
+                exit 0
+                ;;
+              Failed|Cancelled|TimedOut)
+                aws ssm get-command-invocation \
+                  --region "$AWS_REGION" \
+                  --command-id "$COMMAND_ID" \
+                  --instance-id "$INSTANCE_ID" \
+                  --query '{Status:Status,Output:StandardOutputContent,Error:StandardErrorContent}' \
+                  --output json
+                exit 1
+                ;;
+            esac
+          
+            sleep 5
+          done
+          
+          echo "Timed out waiting for SSM command."
+          exit 1
