@@ -5,10 +5,12 @@ import com.example.backend.dto.request.LoginRequest;
 import com.example.backend.dto.request.RegisterRequest;
 import com.example.backend.dto.request.RoleRequest;
 import com.example.backend.dto.response.UserResponse;
+import com.example.backend.dto.response.UserRoleResponse;
 import com.example.backend.entity.Users;
 import com.example.backend.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -71,6 +73,16 @@ public class UsersController {
           users.getRole());
     } catch (AuthenticationException e) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+  }
+
+  @PostMapping("/logout")
+  public void logout(HttpServletRequest request) {
+    SecurityContextHolder.clearContext();
+
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.invalidate();
     }
   }
 
@@ -183,7 +195,7 @@ public class UsersController {
   }
 
   @GetMapping("/users")
-  public List<UserResponse> findAll() {
-    return usersService.findAll();
+  public List<UserRoleResponse> findAll() {
+    return usersService.findAllRoles();
   }
 }

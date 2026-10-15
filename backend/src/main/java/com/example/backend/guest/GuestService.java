@@ -38,6 +38,7 @@ public class GuestService {
     guest = usersRepository.save(guest);
 
     guest.setNickname("ゲスト" + guest.getId());
+    guest = usersRepository.save(guest);
 
     return guest;
   }

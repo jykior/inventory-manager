@@ -84,9 +84,11 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.PATCH, "/api/items/*/stock")
             .hasAnyRole("ADMIN", "MANAGER", "STAFF", "GUEST")
 
-            // 権限変更
+            // 権限管理
+            .requestMatchers(HttpMethod.GET, "/api/auth/users")
+            .hasRole("ADMIN")
             .requestMatchers(HttpMethod.PATCH, "/api/auth/*/role")
-            .hasAnyRole("ADMIN")
+            .hasRole("ADMIN")
 
             // メールアドレス・パスワード・ニックネーム変更
             .requestMatchers(HttpMethod.PATCH, "/api/auth/email", "/api/auth/password", "/api/auth/nickname")

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { getItems, getCategories } from "./api/itemApi";
-import { guestLogout } from "./api/authApi";
+import { logout, guestLogout } from "./api/authApi";
 import { User } from "lucide-react";
 import Items from "./components/inventory/Items";
 import Sidebar from "./components/common/Sidebar";
@@ -67,6 +67,8 @@ function App() {
   const handleLogout = async () => {
     if (user?.role === "GUEST") {
       await guestLogout();
+    } else {
+      await logout();
     }
 
     sessionStorage.removeItem("user");

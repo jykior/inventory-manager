@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   deleteAccount,
+  guestLogout,
   updateEmail,
   updatePassword,
   updateNickname,
@@ -104,7 +105,11 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
   };
 
   const handleDeleteAccount = async () => {
-    await deleteAccount();
+    if (user?.role === "GUEST") {
+      await guestLogout();
+    } else {
+      await deleteAccount();
+    }
     onAccountDeleted();
   };
 

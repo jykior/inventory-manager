@@ -4,11 +4,13 @@ import com.example.backend.dto.response.UserResponse;
 import com.example.backend.entity.Users;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
 /**
  * ゲストログイン・ログアウトに関するAPIを提供するコントローラークラス。
  */
@@ -65,12 +68,20 @@ public class GuestController {
   }
 
   @PostMapping("/logout")
-  public void logout(Authentication authentication) {
-    if ("ROLE_GUEST".equals(authentication.getAuthorities().iterator().next()
-        .getAuthority())) {
-
-      guestService.deleteDemoData();
+  public void logout(Authentication authentication, HttpServletRequest request) {
+    if (authentication != null) {
+      for (GrantedAuthority authority : authentication.getAuthorities()) {
+        if ("ROLE_GUEST".equals(authority.getAuthority())) {
+          guestService.deleteDemoData();
+          break;
+        }
+      }
     }
     SecurityContextHolder.clearContext();
+
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.invalidate();
+    }
   }
 }

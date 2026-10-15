@@ -391,16 +391,17 @@ erDiagram
 
 ### 認証・ユーザーAPI
 
-| HTTPメソッド | URL | 処理内容 |
-|---|---|---|
-| POST | `/api/auth/login` | ログイン |
-| POST | `/api/auth/register` | ユーザー登録 |
-| PATCH | `/api/auth/{id}/role` | ユーザー権限変更 |
-| PATCH | `/api/auth/email` | メールアドレス変更 |
-| PATCH | `/api/auth/password` | パスワード変更 |
-| PATCH | `/api/auth/nickname` | ニックネーム変更 |
-| DELETE | `/api/auth` | ユーザー削除 |
-| GET | `/api/auth/users` | ユーザー一覧取得 |
+| HTTPメソッド | URL                   | 処理内容      |
+|---|-----------------------|-----------|
+| POST | `/api/auth/login`     | ログイン      |
+| POST | `/api/auth/logout`    | ログアウト     |
+| POST | `/api/auth/register`  | ユーザー登録    |
+| PATCH | `/api/auth/{id}/role` | ユーザー権限変更  |
+| PATCH | `/api/auth/email`     | メールアドレス変更 |
+| PATCH | `/api/auth/password`  | パスワード変更   |
+| PATCH | `/api/auth/nickname`  | ニックネーム変更  |
+| DELETE | `/api/auth`           | ユーザー削除    |
+| GET | `/api/auth/users`     | ユーザー一覧取得  |
 
 ### ゲストAPI
 

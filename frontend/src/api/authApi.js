@@ -19,6 +19,17 @@ export const login = async (email, password) => {
   return await response.json();
 };
 
+export const logout = async () => {
+  const response = await fetch(`${API_URL}/api/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("LOGOUT_FAILED");
+  }
+};
+
 export const guestLogin = async () => {
   const response = await fetch(`${API_URL}/api/guest/login`, {
     method: "POST",

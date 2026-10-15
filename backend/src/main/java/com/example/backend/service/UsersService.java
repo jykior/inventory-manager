@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dto.request.RegisterRequest;
 import com.example.backend.dto.response.UserResponse;
+import com.example.backend.dto.response.UserRoleResponse;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.UsersRepository;
 import java.util.List;
@@ -107,11 +108,10 @@ public class UsersService {
     usersRepository.save(users);
   }
 
-  public List<UserResponse> findAll() {
+  public List<UserRoleResponse> findAllRoles() {
     return usersRepository.findAll().stream()
-        .map(users -> new UserResponse(
+        .map(users -> new UserRoleResponse(
             users.getId(),
-            users.getEmail(),
             users.getNickname(),
             users.getRole()
         )).toList();
