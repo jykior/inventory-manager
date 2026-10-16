@@ -1,7 +1,9 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.request.AccountUpdateRequest;
+import com.example.backend.dto.request.EmailUpdateRequest;
 import com.example.backend.dto.request.LoginRequest;
+import com.example.backend.dto.request.NicknameUpdateRequest;
+import com.example.backend.dto.request.PasswordUpdateRequest;
 import com.example.backend.dto.request.RegisterRequest;
 import com.example.backend.dto.request.RoleRequest;
 import com.example.backend.dto.response.UserResponse;
@@ -11,6 +13,7 @@ import com.example.backend.service.UsersService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,14 +47,14 @@ public class UsersController {
 
   @PostMapping("/login")
   public UserResponse login(
-      @RequestBody LoginRequest request,
+      @Valid @RequestBody LoginRequest loginRequest,
       HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse) {
 
     try {
       Authentication authentication = usersService.login(
-          request.getEmail(),
-          request.getPassword()
+          loginRequest.getEmail(),
+          loginRequest.getPassword()
       );
 
       SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -63,14 +66,10 @@ public class UsersController {
           httpServletRequest,
           httpServletResponse
       );
-
       Users users = usersService.findByEmail(authentication.getName());
 
-      return new UserResponse(
-          users.getId(),
-          users.getEmail(),
-          users.getNickname(),
-          users.getRole());
+      return UserResponse.from(users);
+
     } catch (AuthenticationException e) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
@@ -87,16 +86,12 @@ public class UsersController {
   }
 
   @PostMapping("/register")
-  public UserResponse register(@RequestBody RegisterRequest request) {
+  public UserResponse register(@Valid @RequestBody RegisterRequest registerRequest) {
     try {
-      Users users = usersService.register(request);
+      Users users = usersService.register(registerRequest);
 
-      return new UserResponse(
-          users.getId(),
-          users.getEmail(),
-          users.getNickname(),
-          users.getRole()
-      );
+      return UserResponse.from(users);
+
     } catch (IllegalArgumentException e) {
       if ("EMAIL_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -107,13 +102,13 @@ public class UsersController {
 
   @PatchMapping("/email")
   public UserResponse updateEmail(
-      @RequestBody AccountUpdateRequest request,
+      @Valid @RequestBody EmailUpdateRequest emailUpdateRequest,
       Authentication authentication,
       HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse) {
 
     try {
-      Users users = usersService.updateEmail(authentication.getName(), request.getEmail());
+      Users users = usersService.updateEmail(authentication.getName(), emailUpdateRequest.getEmail());
 
       Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
           users.getEmail(),
@@ -130,13 +125,8 @@ public class UsersController {
           httpServletRequest,
           httpServletResponse
       );
+      return UserResponse.from(users);
 
-      return new UserResponse(
-          users.getId(),
-          users.getEmail(),
-          users.getNickname(),
-          users.getRole()
-      );
     } catch (IllegalArgumentException e) {
       if ("EMAIL_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -147,10 +137,10 @@ public class UsersController {
 
   @PatchMapping("/password")
   public void updatePassword(
-      @RequestBody AccountUpdateRequest request,
+      @Valid @RequestBody PasswordUpdateRequest passwordUpdateRequest,
       Authentication authentication) {
     try {
-      usersService.updatePassword(authentication.getName(), request.getPassword());
+      usersService.updatePassword(authentication.getName(), passwordUpdateRequest.getPassword());
     } catch (IllegalArgumentException e) {
       if ("SAME_PASSWORD".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -161,26 +151,21 @@ public class UsersController {
 
   @PatchMapping("/nickname")
   public UserResponse updateNickname(
-      @RequestBody AccountUpdateRequest request,
+      @Valid @RequestBody NicknameUpdateRequest nicknameUpdateRequest,
       Authentication authentication) {
 
     Users users = usersService.updateNickname(
         authentication.getName(),
-        request.getNickname()
+        nicknameUpdateRequest.getNickname()
     );
 
-    return new UserResponse(
-        users.getId(),
-        users.getEmail(),
-        users.getNickname(),
-        users.getRole()
-    );
+    return UserResponse.from(users);
   }
 
   @PatchMapping("/{id}/role")
-  public void updateRole(@PathVariable Long id, @RequestBody RoleRequest request) {
+  public void updateRole(@PathVariable Long id, @Valid @RequestBody RoleRequest roleRequest) {
     try {
-      usersService.updateRole(id, request.getRole());
+      usersService.updateRole(id, roleRequest.getRole());
     } catch (IllegalArgumentException e) {
       if ("ADMIN_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);

@@ -11,7 +11,7 @@ export const login = async (email, password) => {
   });
 
   if (!response.ok) {
-    if (response.status === 401) {
+    if (response.status === 400 || response.status === 401) {
       throw new Error("LOGIN_FAILED");
     }
     throw new Error("LOGIN_REQUEST_FAILED");

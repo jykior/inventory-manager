@@ -1,19 +1,13 @@
 package com.example.backend.dto.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.example.backend.entity.Users;
 
-@Getter
-@Setter
+/**
+ * ユーザーの権限一覧用レスポンスDTO。
+ */
+public record UserRoleResponse(Long id, String nickname, String role) {
 
-public class UserRoleResponse {
-  private Long id;
-  private String nickname;
-  private String role;
-
-  public UserRoleResponse(Long id,  String nickname, String role) {
-    this.id = id;
-    this.nickname = nickname;
-    this.role = role;
+  public static UserRoleResponse from(Users users) {
+    return new UserRoleResponse(users.getId(), users.getNickname(), users.getRole());
   }
 }

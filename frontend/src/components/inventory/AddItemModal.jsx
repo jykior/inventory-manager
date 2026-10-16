@@ -2,7 +2,12 @@ import { useState } from "react";
 import { createItem } from "../../api/itemApi";
 import AddCategoryModal from "./AddCategoryModal";
 
-function AddItemModal({ categories ,onClose, onItemCreated,onCategoriesChanged }) {
+function AddItemModal({
+  categories,
+  onClose,
+  onItemCreated,
+  onCategoriesChanged,
+}) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [currentStock, setCurrentStock] = useState("");
@@ -11,12 +16,12 @@ function AddItemModal({ categories ,onClose, onItemCreated,onCategoriesChanged }
   const [error, setError] = useState("");
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("");
-/**
- * 商品を登録する。
- *
- * 入力内容をチェックし、
- * 商品を作成した後に商品一覧を更新する。
- */
+  /**
+   * 商品を登録する。
+   *
+   * 入力内容をチェックし、
+   * 商品を作成した後に商品一覧を更新する。
+   */
   const handleSubmit = async () => {
     setError("");
 
@@ -31,7 +36,7 @@ function AddItemModal({ categories ,onClose, onItemCreated,onCategoriesChanged }
     try {
       const item = {
         name: name.trim(),
-        category: { id: Number(category) },
+        categoryId: Number(category),
         currentStock: currentStock,
         minStock,
         alertEnabled,
@@ -54,7 +59,9 @@ function AddItemModal({ categories ,onClose, onItemCreated,onCategoriesChanged }
         <div className="item-modal-header">
           <h2>商品を追加</h2>
 
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         {error && <p className="form-error">{error}</p>}

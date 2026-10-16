@@ -1,7 +1,9 @@
 package com.example.backend.controller;
 
-import com.example.backend.entity.Category;
+import com.example.backend.dto.request.CategoryRequest;
+import com.example.backend.dto.response.CategoryResponse;
 import com.example.backend.service.CategoryService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -29,14 +31,14 @@ public class CategoryController {
   }
 
   @GetMapping
-  public List<Category> getCategories() {
+  public List<CategoryResponse> getCategories() {
     return categoryService.findAll();
   }
 
   @PostMapping
-  public Category createCategory(@RequestBody Category category) {
+  public CategoryResponse createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
     try {
-      return categoryService.createCategory(category);
+      return categoryService.createCategory(categoryRequest);
     } catch (IllegalArgumentException e) {
       if ("CATEGORY_NAME_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -46,9 +48,9 @@ public class CategoryController {
   }
 
   @PutMapping("/{id}")
-  public Category updateCategory(@PathVariable Long id, @RequestBody Category category) {
+  public CategoryResponse updateCategory(@PathVariable Long id,@Valid @RequestBody CategoryRequest categoryRequest) {
     try {
-      return categoryService.updateCategory(id, category);
+      return categoryService.updateCategory(id, categoryRequest);
     } catch (IllegalArgumentException e) {
       if ("CATEGORY_NAME_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);

@@ -1,5 +1,7 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.request.CategoryRequest;
+import com.example.backend.dto.response.CategoryResponse;
 import com.example.backend.entity.Category;
 import com.example.backend.guest.GuestService;
 import com.example.backend.repository.CategoryRepository;
@@ -37,33 +39,40 @@ public class CategoryService {
     return false;
   }
 
-  public List<Category> findAll() {
+  public List<CategoryResponse> findAll() {
     boolean isDemo = isGuest();
     Long guestId = null;
 
     if (isDemo) {
       guestId = guestService.getCurrentGuestId();
     }
-    return categoryRepository.findAllByIsDemoAndGuestId(isDemo, guestId);
+    return categoryRepository
+        .findAllByIsDemoAndGuestId(isDemo, guestId)
+        .stream()
+        .map(CategoryResponse::from)
+        .toList();
   }
 
-  public Category createCategory(Category category) {
+  public CategoryResponse createCategory(CategoryRequest categoryRequest) {
     boolean isDemo = isGuest();
     Long guestId = null;
 
     if (isDemo) {
       guestId = guestService.getCurrentGuestId();
     }
-    if (categoryRepository.existsByNameAndIsDemoAndGuestId(category.getName(), isDemo, guestId)) {
+    if (categoryRepository.existsByNameAndIsDemoAndGuestId(categoryRequest.getName(), isDemo, guestId)) {
       throw new IllegalArgumentException("CATEGORY_NAME_ALREADY_EXISTS");
     }
+    Category category = new Category();
+    category.setName(categoryRequest.getName());
+    category.setColorCode(categoryRequest.getColorCode());
     category.setIsDemo(isDemo);
     category.setGuestId(guestId);
 
-    return categoryRepository.save(category);
+    return CategoryResponse.from(categoryRepository.save(category));
   }
 
-  public Category updateCategory(Long id, Category category) {
+  public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
     boolean isDemo = isGuest();
     Long guestId = null;
 
@@ -75,19 +84,19 @@ public class CategoryService {
         categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
             .orElseThrow(IllegalArgumentException::new);
 
-    if (!existingCategory.getName().equals(category.getName())
+    if (!existingCategory.getName().equals(categoryRequest.getName())
         && categoryRepository.existsByNameAndIsDemoAndGuestId(
-        category.getName(),
+        categoryRequest.getName(),
         isDemo,
         guestId)
     ) {
       throw new IllegalArgumentException("CATEGORY_NAME_ALREADY_EXISTS");
     }
 
-    existingCategory.setName(category.getName());
-    existingCategory.setColorCode(category.getColorCode());
+    existingCategory.setName(categoryRequest.getName());
+    existingCategory.setColorCode(categoryRequest.getColorCode());
 
-    return categoryRepository.save(existingCategory);
+    return CategoryResponse.from(categoryRepository.save(existingCategory));
   }
 
   public void deleteCategory(Long id) {

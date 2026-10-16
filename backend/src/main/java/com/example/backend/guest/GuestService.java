@@ -6,7 +6,6 @@ import com.example.backend.entity.Users;
 import com.example.backend.repository.CategoryRepository;
 import com.example.backend.repository.ItemRepository;
 import com.example.backend.repository.UsersRepository;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 /**
  * ゲストユーザーの作成やデモデータの管理を行うサービスクラス。
  */
@@ -26,7 +27,7 @@ public class GuestService {
 
   private final CategoryRepository categoryRepository;
   private final ItemRepository itemRepository;
-  public final UsersRepository usersRepository;
+  private final UsersRepository usersRepository;
 
   public Users guestLogin() {
     Users guest = new Users();
@@ -50,12 +51,13 @@ public class GuestService {
 
     return usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("GUEST_NOT_FOUND")).getId();
   }
+
   /**
    * ゲストの最終アクセス日時を更新する。
    *
    * @return ゲストが存在して更新できた場合はtrue、存在しない場合はfalse
    */
-  public boolean  updateLastAccessedAt() {
+  public boolean updateLastAccessedAt() {
     Authentication authentication =
         SecurityContextHolder.getContext().getAuthentication();
 

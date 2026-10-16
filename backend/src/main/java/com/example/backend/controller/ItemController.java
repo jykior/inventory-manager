@@ -1,9 +1,11 @@
 package com.example.backend.controller;
 
-import com.example.backend.entity.Item;
+import com.example.backend.dto.request.ItemRequest;
+import com.example.backend.dto.request.StockUpdateRequest;
+import com.example.backend.dto.response.ItemResponse;
 import com.example.backend.service.ItemService;
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,14 +30,14 @@ public class ItemController {
   private final ItemService itemService;
 
   @GetMapping
-  public List<Item> getItem() {
+  public List<ItemResponse> getItem() {
     return itemService.findAll();
   }
 
   @PostMapping
-  public Item createItem(@RequestBody Item item) {
+  public ItemResponse createItem(@Valid @RequestBody ItemRequest itemRequest) {
     try {
-      return itemService.createItem(item);
+      return itemService.createItem(itemRequest);
     } catch (IllegalArgumentException e) {
       if ("ITEM_NAME_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -54,18 +56,18 @@ public class ItemController {
   }
 
   @PutMapping("/{id}")
-  public Item updateItem(@PathVariable Long id, @RequestBody Item item) {
+  public ItemResponse updateItem(@PathVariable Long id, @Valid @RequestBody ItemRequest itemRequest) {
     try {
-      return itemService.updateItem(id, item);
+      return itemService.updateItem(id, itemRequest);
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
   }
 
   @PatchMapping("/{id}/stock")
-  public Item updateStock(@PathVariable Long id, @RequestBody Map<String, Integer> request) {
+  public ItemResponse updateStock(@PathVariable Long id, @Valid @RequestBody StockUpdateRequest stockUpdateRequest) {
     try {
-      return itemService.updateStock(id, request.get("currentStock"));
+      return itemService.updateStock(id, stockUpdateRequest.getCurrentStock());
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }

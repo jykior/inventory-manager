@@ -1,7 +1,6 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.request.RegisterRequest;
-import com.example.backend.dto.response.UserResponse;
 import com.example.backend.dto.response.UserRoleResponse;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.UsersRepository;
@@ -43,22 +42,22 @@ public class UsersService {
     usersRepository.delete(users);
   }
 
-  public Users register(RegisterRequest request) {
-    if (usersRepository.existsByEmail(request.getEmail())) {
+  public Users register(RegisterRequest registerRequest) {
+    if (usersRepository.existsByEmail(registerRequest.getEmail())) {
       throw new IllegalArgumentException("EMAIL_ALREADY_EXISTS");
     }
-    if (!request.getPassword().equals(request.getConfirmPassword())) {
+    if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
       throw new IllegalArgumentException();
     }
     Users users = new Users();
 
-    users.setEmail(request.getEmail());
+    users.setEmail(registerRequest.getEmail());
 
-    users.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+    users.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
 
     users.setRole("STAFF");
 
-    users.setNickname(request.getNickname());
+    users.setNickname(registerRequest.getNickname());
 
     return usersRepository.save(users);
   }
@@ -97,11 +96,8 @@ public class UsersService {
     if ("ADMIN".equals(role) && usersRepository.existsByRole("ADMIN")) {
       throw new IllegalArgumentException("ADMIN_ALREADY_EXISTS");
     }
-    if (!"ADMIN".equals(role) && !"MANAGER".equals(role) && !"STAFF".equals(role) && !"GUEST".equals(role)) {
-      throw new IllegalArgumentException();
-    }
 
-    Users users = usersRepository.findById(id).orElseThrow();
+    Users users = usersRepository.findById(id).orElseThrow(IllegalArgumentException::new);
 
     users.setRole(role);
 
@@ -109,11 +105,6 @@ public class UsersService {
   }
 
   public List<UserRoleResponse> findAllRoles() {
-    return usersRepository.findAll().stream()
-        .map(users -> new UserRoleResponse(
-            users.getId(),
-            users.getNickname(),
-            users.getRole()
-        )).toList();
+    return usersRepository.findAll().stream().map(UserRoleResponse::from).toList();
   }
 }

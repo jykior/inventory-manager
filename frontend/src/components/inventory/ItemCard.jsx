@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { getStockStatus } from "../../utils/stockStatus";
 import { deleteItem, updateStock as updateStockApi } from "../../api/itemApi";
 import EditItemModal from "./EditItemModal";
@@ -163,121 +164,127 @@ function ItemCard({
         </td>
       </tr>
       {/*商品編集モーダル*/}
-      {isEditItemModalOpen && (
-        <EditItemModal
-          item={item}
-          categories={categories}
-          onClose={() => {
-            setIsEditItemModalOpen(false);
-          }}
-          onItemChanged={onItemsChanged}
-        />
-      )}
+      {isEditItemModalOpen &&
+        createPortal(
+          <EditItemModal
+            item={item}
+            categories={categories}
+            onClose={() => {
+              setIsEditItemModalOpen(false);
+            }}
+            onItemChanged={onItemsChanged}
+          />,
+          document.body,
+        )}
 
       {/* 商品入庫モーダル */}
-      {isStockInModalOpen && (
-        <div
-          className="modal-overlay"
-          onClick={() => {
-            setIsStockInModalOpen(false);
-          }}
-        >
+      {isStockInModalOpen &&
+        createPortal(
           <div
-            className="stock-in-modal"
-            onClick={(e) => {
-              e.stopPropagation();
+            className="modal-overlay"
+            onClick={() => {
+              setIsStockInModalOpen(false);
             }}
           >
-            <div className="stock-in-modal-header">
-              <h2>商品入庫</h2>
+            <div
+              className="stock-in-modal"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <div className="stock-in-modal-header">
+                <h2>商品入庫</h2>
 
-              <button
-                className="close-button"
-                onClick={() => {
-                  setIsStockInModalOpen(false);
-                }}
-              >
-                ×
-              </button>
+                <button
+                  className="close-button"
+                  onClick={() => {
+                    setIsStockInModalOpen(false);
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="stock-in-info">
+                <p>
+                  商品名：<span>{item.name}</span>
+                </p>
+
+                <p>
+                  現在庫：<span>{item.currentStock}個</span>
+                </p>
+              </div>
+
+              <label className="stock-in-label">
+                入庫数
+                <input
+                  type="number"
+                  min="1"
+                  value={stockChange === 0 ? "" : stockChange}
+                  onChange={(e) => {
+                    setStockChange(Number(e.target.value));
+                  }}
+                  placeholder="入庫数を入力"
+                />
+              </label>
+
+              <div className="stock-in-modal-buttons">
+                <button
+                  className="stock-in-cancel-button"
+                  onClick={() => {
+                    setStockChange(0);
+                    setIsStockInModalOpen(false);
+                  }}
+                >
+                  キャンセル
+                </button>
+
+                <button
+                  className="stock-in-confirm-button"
+                  onClick={async () => {
+                    if (stockChange <= 0) {
+                      return;
+                    }
+                    await handleStockChange(
+                      item,
+                      item.currentStock + stockChange,
+                    );
+                    setStockChange(0);
+                    setIsStockInModalOpen(false);
+                    onSelectItem(null);
+                  }}
+                  disabled={stockChange <= 0}
+                >
+                  入庫する
+                </button>
+              </div>
             </div>
-
-            <div className="stock-in-info">
-              <p>
-                商品名：<span>{item.name}</span>
-              </p>
-
-              <p>
-                現在庫：<span>{item.currentStock}個</span>
-              </p>
-            </div>
-
-            <label className="stock-in-label">
-              入庫数
-              <input
-                type="number"
-                min="1"
-                value={stockChange === 0 ? "" : stockChange}
-                onChange={(e) => {
-                  setStockChange(Number(e.target.value));
-                }}
-                placeholder="入庫数を入力"
-              />
-            </label>
-
-            <div className="stock-in-modal-buttons">
-              <button
-                className="stock-in-cancel-button"
-                onClick={() => {
-                  setStockChange(0);
-                  setIsStockInModalOpen(false);
-                }}
-              >
-                キャンセル
-              </button>
-
-              <button
-                className="stock-in-confirm-button"
-                onClick={async () => {
-                  if (stockChange <= 0) {
-                    return;
-                  }
-                  await handleStockChange(
-                    item,
-                    item.currentStock + stockChange,
-                  );
-                  setStockChange(0);
-                  setIsStockInModalOpen(false);
-                  onSelectItem(null);
-                }}
-                disabled={stockChange <= 0}
-              >
-                入庫する
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
       {/* 商品削除確認モーダル */}
-      {isDeleteItemModalOpen && (
-        <div className="modal-overlay">
-          <div className="delete-modal">
-            <h3>この商品を削除しますか？</h3>
+      {isDeleteItemModalOpen &&
+        createPortal(
+          <div className="modal-overlay">
+            <div className="delete-modal">
+              <h3>この商品を削除しますか？</h3>
 
-            <div className="delete-modal-buttons">
-              <button onClick={() => setIsDeleteItemModalOpen(false)}>
-                キャンセル
-              </button>
+              <div className="delete-modal-buttons">
+                <button onClick={() => setIsDeleteItemModalOpen(false)}>
+                  キャンセル
+                </button>
 
-              <button
-                className="delete-confirm-button"
-                onClick={handleDeleteItem}
-              >
-                削除する
-              </button>
+                <button
+                  className="delete-confirm-button"
+                  onClick={handleDeleteItem}
+                >
+                  削除する
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

@@ -1,6 +1,8 @@
 package com.example.backend.service;
 
 
+import com.example.backend.dto.request.ItemRequest;
+import com.example.backend.dto.response.ItemResponse;
 import com.example.backend.entity.Category;
 import com.example.backend.entity.Item;
 import com.example.backend.guest.GuestService;
@@ -24,7 +26,9 @@ public class ItemService {
   private final CategoryRepository categoryRepository;
   private final GuestService guestService;
 
-  // 現在のログインユーザーがゲストか判定する
+  /**
+   * 現在のログインユーザーがゲストか判定する
+   */
   private boolean isGuest() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -39,35 +43,45 @@ public class ItemService {
     return false;
   }
 
-  public List<Item> findAll() {
+  public List<ItemResponse> findAll() {
     boolean isDemo = isGuest();
     Long guestId = null;
 
     if (isDemo) {
       guestId = guestService.getCurrentGuestId();
     }
-    return itemRepository.findAllByIsDemoAndGuestIdOrderBySortOrderAsc(isDemo, guestId);
+    return itemRepository.
+        findAllByIsDemoAndGuestIdOrderBySortOrderAsc(isDemo, guestId)
+        .stream()
+        .map(ItemResponse::from)
+        .toList();
   }
 
-  public Item createItem(Item item) {
+  public ItemResponse createItem(ItemRequest itemRequest) {
     boolean isDemo = isGuest();
     Long guestId = null;
 
     if (isDemo) {
       guestId = guestService.getCurrentGuestId();
     }
-    if (itemRepository.existsByNameAndIsDemoAndGuestId(item.getName(), isDemo, guestId)) {
+    if (itemRepository.existsByNameAndIsDemoAndGuestId(itemRequest.getName(), isDemo, guestId)) {
       throw new IllegalArgumentException("ITEM_NAME_ALREADY_EXISTS");
     }
 
-    Category category = categoryRepository.findByIdAndIsDemoAndGuestId(item.getCategory().getId(), isDemo, guestId)
+    Category category = categoryRepository.findByIdAndIsDemoAndGuestId(itemRequest.getCategoryId(), isDemo, guestId)
         .orElseThrow(IllegalArgumentException::new);
 
+    Item item = new Item();
+    item.setName(itemRequest.getName());
+    item.setCategory(category);
+    item.setCurrentStock(itemRequest.getCurrentStock());
+    item.setAlertEnabled(itemRequest.getAlertEnabled());
+    item.setMinStock(itemRequest.getMinStock());
+    item.setSortOrder(itemRequest.getSortOrder());
     item.setIsDemo(isDemo);
     item.setGuestId(guestId);
-    item.setCategory(category);
 
-    return itemRepository.save(item);
+    return ItemResponse.from(itemRepository.save(item));
   }
 
   public void deleteItem(Long id) {
@@ -83,7 +97,7 @@ public class ItemService {
     itemRepository.delete(item);
   }
 
-  public Item updateItem(Long id, Item updateItem) {
+  public ItemResponse updateItem(Long id, ItemRequest itemRequest) {
     boolean isDemo = isGuest();
     Long guestId = null;
 
@@ -93,23 +107,22 @@ public class ItemService {
     Item item = itemRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
         .orElseThrow(IllegalArgumentException::new);
 
-    item.setName(updateItem.getName());
+    item.setName(itemRequest.getName());
 
     Category category = categoryRepository.
-        findByIdAndIsDemoAndGuestId(updateItem.getCategory().getId(), isDemo, guestId)
+        findByIdAndIsDemoAndGuestId(itemRequest.getCategoryId(), isDemo, guestId)
         .orElseThrow(IllegalArgumentException::new);
 
     item.setCategory(category);
-    item.setCurrentStock(updateItem.getCurrentStock());
-    item.setAlertEnabled(updateItem.getAlertEnabled());
-    item.setMinStock(updateItem.getMinStock());
-    item.setSortOrder(updateItem.getSortOrder());
-    item.setGuestId(guestId);
+    item.setCurrentStock(itemRequest.getCurrentStock());
+    item.setAlertEnabled(itemRequest.getAlertEnabled());
+    item.setMinStock(itemRequest.getMinStock());
+    item.setSortOrder(itemRequest.getSortOrder());
 
-    return itemRepository.save(item);
+    return ItemResponse.from(itemRepository.save(item));
   }
 
-  public Item updateStock(Long id, Integer newStock) {
+  public ItemResponse updateStock(Long id, Integer newStock) {
     boolean isDemo = isGuest();
     Long guestId = null;
 
@@ -121,6 +134,6 @@ public class ItemService {
 
     item.setCurrentStock(newStock);
 
-    return itemRepository.save(item);
+    return ItemResponse.from(itemRepository.save(item));
   }
 }

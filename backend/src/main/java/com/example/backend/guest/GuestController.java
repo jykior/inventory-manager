@@ -56,12 +56,7 @@ public class GuestController {
           httpServletResponse
       );
 
-      return new UserResponse(
-          guest.getId(),
-          guest.getEmail(),
-          guest.getNickname(),
-          guest.getRole()
-      );
+      return  UserResponse.from(guest);
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.CONFLICT);
     }
