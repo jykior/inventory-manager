@@ -104,6 +104,7 @@ function App() {
       <Sidebar
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
+        setInitialStatus={setInitialStatus}
         user={user}
       />
 

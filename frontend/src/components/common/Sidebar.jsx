@@ -1,7 +1,7 @@
 import "./Common.css";
-import { Settings, House, Package,UserStar } from "lucide-react";
+import { Settings, House, Package, UserStar } from "lucide-react";
 
-function Sidebar({ currentPage, setCurrentPage, user }) {
+function Sidebar({ currentPage, setCurrentPage, setInitialStatus, user }) {
   return (
     <aside className="sidebar">
       <h1>INVENTORY MANAGER</h1>
@@ -17,7 +17,10 @@ function Sidebar({ currentPage, setCurrentPage, user }) {
         </button>
         <button
           className={currentPage === "items" ? "active" : ""}
-          onClick={() => setCurrentPage("items")}
+          onClick={() => {
+            setInitialStatus("すべて");
+            setCurrentPage("items");
+          }}
         >
           <Package size={24} /> 商品一覧
         </button>
