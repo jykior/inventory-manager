@@ -22,30 +22,11 @@ public class CategoryService {
   private final CategoryRepository categoryRepository;
   private final GuestService guestService;
 
-  /**
-   * 現在のログインユーザーがゲストか判定する
-    */
-  private boolean isGuest() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    if (authentication == null) {
-      return false;
-    }
-    for (GrantedAuthority authority : authentication.getAuthorities()) {
-      if ("ROLE_GUEST".equals(authority.getAuthority())) {
-        return true;
-      }
-    }
-    return false;
-  }
 
   public List<CategoryResponse> findAll() {
-    boolean isDemo = isGuest();
-    Long guestId = null;
+    Long guestId = guestService.getGuestIdOrNull();
+    boolean isDemo = guestId != null;
 
-    if (isDemo) {
-      guestId = guestService.getCurrentGuestId();
-    }
     return categoryRepository
         .findAllByIsDemoAndGuestId(isDemo, guestId)
         .stream()
@@ -54,12 +35,9 @@ public class CategoryService {
   }
 
   public CategoryResponse createCategory(CategoryRequest categoryRequest) {
-    boolean isDemo = isGuest();
-    Long guestId = null;
+    Long guestId = guestService.getGuestIdOrNull();
+    boolean isDemo = guestId != null;
 
-    if (isDemo) {
-      guestId = guestService.getCurrentGuestId();
-    }
     if (categoryRepository.existsByNameAndIsDemoAndGuestId(categoryRequest.getName(), isDemo, guestId)) {
       throw new IllegalArgumentException("CATEGORY_NAME_ALREADY_EXISTS");
     }
@@ -73,12 +51,8 @@ public class CategoryService {
   }
 
   public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
-    boolean isDemo = isGuest();
-    Long guestId = null;
-
-    if (isDemo) {
-      guestId = guestService.getCurrentGuestId();
-    }
+    Long guestId = guestService.getGuestIdOrNull();
+    boolean isDemo = guestId != null;
 
     Category existingCategory =
         categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
@@ -100,12 +74,9 @@ public class CategoryService {
   }
 
   public void deleteCategory(Long id) {
-    boolean isDemo = isGuest();
-    Long guestId = null;
+    Long guestId = guestService.getGuestIdOrNull();
+    boolean isDemo = guestId != null;
 
-    if (isDemo) {
-      guestId = guestService.getCurrentGuestId();
-    }
     Category category =
         categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
             .orElseThrow(IllegalArgumentException::new);

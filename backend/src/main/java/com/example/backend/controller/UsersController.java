@@ -57,6 +57,9 @@ public class UsersController {
           loginRequest.getPassword()
       );
 
+      httpServletRequest.getSession(true);
+      httpServletRequest.changeSessionId();
+
       SecurityContext context = SecurityContextHolder.createEmptyContext();
       context.setAuthentication(authentication);
       SecurityContextHolder.setContext(context);

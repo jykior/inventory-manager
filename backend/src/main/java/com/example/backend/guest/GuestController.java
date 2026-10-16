@@ -46,6 +46,9 @@ public class GuestController {
           List.of(new SimpleGrantedAuthority("ROLE_GUEST"))
       );
 
+      httpServletRequest.getSession(true);
+      httpServletRequest.changeSessionId();
+
       SecurityContext context = SecurityContextHolder.createEmptyContext();
       context.setAuthentication(authentication);
       SecurityContextHolder.setContext(context);

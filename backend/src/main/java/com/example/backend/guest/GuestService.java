@@ -14,12 +14,13 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * ゲストユーザーの作成やデモデータの管理を行うサービスクラス。
+ * ゲストユーザーの作成・判定やデモデータの管理を行うサービスクラス。
  */
 @Service
 @RequiredArgsConstructor
@@ -51,7 +52,28 @@ public class GuestService {
 
     return usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("GUEST_NOT_FOUND")).getId();
   }
+  /**
+   * 現在のログインユーザーがゲストか判定する
+   */
+  private boolean isGuest() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+    if (authentication == null) {
+      return false;
+    }
+    for (GrantedAuthority authority : authentication.getAuthorities()) {
+      if ("ROLE_GUEST".equals(authority.getAuthority())) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /**
+   * ゲストならゲストID、それ以外はnullを返す。
+   */
+  public Long getGuestIdOrNull() {
+    return isGuest() ? getCurrentGuestId() : null;
+  }
   /**
    * ゲストの最終アクセス日時を更新する。
    *

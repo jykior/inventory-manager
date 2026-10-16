@@ -26,30 +26,10 @@ public class ItemService {
   private final CategoryRepository categoryRepository;
   private final GuestService guestService;
 
-  /**
-   * 現在のログインユーザーがゲストか判定する
-   */
-  private boolean isGuest() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    if (authentication == null) {
-      return false;
-    }
-    for (GrantedAuthority authority : authentication.getAuthorities()) {
-      if ("ROLE_GUEST".equals(authority.getAuthority())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public List<ItemResponse> findAll() {
-    boolean isDemo = isGuest();
-    Long guestId = null;
+    Long guestId = guestService.getGuestIdOrNull();
+    boolean isDemo = guestId != null;
 
-    if (isDemo) {
-      guestId = guestService.getCurrentGuestId();
-    }
     return itemRepository.
         findAllByIsDemoAndGuestIdOrderBySortOrderAsc(isDemo, guestId)
         .stream()
@@ -58,12 +38,9 @@ public class ItemService {
   }
 
   public ItemResponse createItem(ItemRequest itemRequest) {
-    boolean isDemo = isGuest();
-    Long guestId = null;
+    Long guestId = guestService.getGuestIdOrNull();
+    boolean isDemo = guestId != null;
 
-    if (isDemo) {
-      guestId = guestService.getCurrentGuestId();
-    }
     if (itemRepository.existsByNameAndIsDemoAndGuestId(itemRequest.getName(), isDemo, guestId)) {
       throw new IllegalArgumentException("ITEM_NAME_ALREADY_EXISTS");
     }
@@ -85,12 +62,9 @@ public class ItemService {
   }
 
   public void deleteItem(Long id) {
-    boolean isDemo = isGuest();
-    Long guestId = null;
+    Long guestId = guestService.getGuestIdOrNull();
+    boolean isDemo = guestId != null;
 
-    if (isDemo) {
-      guestId = guestService.getCurrentGuestId();
-    }
     Item item = itemRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
         .orElseThrow(IllegalArgumentException::new);
 
@@ -98,12 +72,9 @@ public class ItemService {
   }
 
   public ItemResponse updateItem(Long id, ItemRequest itemRequest) {
-    boolean isDemo = isGuest();
-    Long guestId = null;
+    Long guestId = guestService.getGuestIdOrNull();
+    boolean isDemo = guestId != null;
 
-    if (isDemo) {
-      guestId = guestService.getCurrentGuestId();
-    }
     Item item = itemRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
         .orElseThrow(IllegalArgumentException::new);
 
@@ -123,12 +94,9 @@ public class ItemService {
   }
 
   public ItemResponse updateStock(Long id, Integer newStock) {
-    boolean isDemo = isGuest();
-    Long guestId = null;
+    Long guestId = guestService.getGuestIdOrNull();
+    boolean isDemo = guestId != null;
 
-    if (isDemo) {
-      guestId = guestService.getCurrentGuestId();
-    }
     Item item = itemRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
         .orElseThrow(IllegalArgumentException::new);
 
