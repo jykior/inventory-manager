@@ -16,14 +16,19 @@ public class ItemRequest {
 
   @NotBlank
   private String name;
+
   @NotNull
   private Long categoryId;
+
   @NotNull
   @Min(0)
   private Integer currentStock;
+
   @NotNull
   private Boolean alertEnabled;
+
   @Min(0)
   private Integer minStock;
+
   private Integer sortOrder;
 }

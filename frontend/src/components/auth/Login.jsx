@@ -30,23 +30,10 @@ function Login({ onLogin }) {
       showMessage("メールアドレスを入力してください", "error");
       return;
     }
-
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailPattern.test(email)) {
-      showMessage("正しいメールアドレスを入力してください", "error");
-      return;
-    }
     if (!password.trim()) {
       showMessage("パスワードを入力してください", "error");
       return;
     }
-
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#]{6,}$/;
-    if (!passwordPattern.test(password)) {
-      showMessage("パスワードは6文字以上の英数字で入力してください", "error");
-      return;
-    }
-
     try {
       const user = await login(email, password);
       onLogin(user);
@@ -56,6 +43,8 @@ function Login({ onLogin }) {
           "メールアドレスまたはパスワードが正しくありません",
           "error",
         );
+      } else if (error.message === "LOGIN_REQUEST_INVALID") {
+        showMessage("入力内容を確認してください", "error");
       } else {
         showMessage("ログインに失敗しました", "error");
       }

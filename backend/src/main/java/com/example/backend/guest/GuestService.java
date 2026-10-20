@@ -13,11 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * ゲストユーザーの作成・判定やデモデータの管理を行うサービスクラス。
@@ -43,58 +45,6 @@ public class GuestService {
     guest = usersRepository.save(guest);
 
     return guest;
-  }
-
-  public Long getCurrentGuestId() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    String email = authentication.getName();
-
-    return usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("GUEST_NOT_FOUND")).getId();
-  }
-  /**
-   * 現在のログインユーザーがゲストか判定する
-   */
-  private boolean isGuest() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    if (authentication == null) {
-      return false;
-    }
-    for (GrantedAuthority authority : authentication.getAuthorities()) {
-      if ("ROLE_GUEST".equals(authority.getAuthority())) {
-        return true;
-      }
-    }
-    return false;
-  }
-  /**
-   * ゲストならゲストID、それ以外はnullを返す。
-   */
-  public Long getGuestIdOrNull() {
-    return isGuest() ? getCurrentGuestId() : null;
-  }
-  /**
-   * ゲストの最終アクセス日時を更新する。
-   *
-   * @return ゲストが存在して更新できた場合はtrue、存在しない場合はfalse
-   */
-  public boolean updateLastAccessedAt() {
-    Authentication authentication =
-        SecurityContextHolder.getContext().getAuthentication();
-
-    String email = authentication.getName();
-
-    Users guest = usersRepository.findByEmail(email).orElse(null);
-
-    if (guest == null) {
-      return false;
-    }
-    guest.setLastAccessedAt(LocalDateTime.now());
-
-    usersRepository.save(guest);
-
-    return true;
   }
 
   public void createDemoData(Long guestId) {
@@ -151,7 +101,66 @@ public class GuestService {
   }
 
   @Transactional
-  public void deleteDemoData() {
+  public Users createGuestWithDemoData() {
+    Users guest = guestLogin();
+    createDemoData(guest.getId());
+    return guest;
+  }
+
+  public Long getCurrentGuestId() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+    return usersRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED)).getId();
+  }
+  /**
+   * 現在のログインユーザーがゲストか判定する
+   */
+  public boolean isGuest() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication == null) {
+      return false;
+    }
+    for (GrantedAuthority authority : authentication.getAuthorities()) {
+      if ("ROLE_GUEST".equals(authority.getAuthority())) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /**
+   * ゲストならゲストID、それ以外はnullを返す。
+   */
+  public Long getGuestIdOrNull() {
+    return isGuest() ? getCurrentGuestId() : null;
+  }
+  /**
+   * ゲストの最終アクセス日時を更新する。
+   *
+   * @return ゲストが存在して更新できた場合はtrue、存在しない場合はfalse
+   */
+  public boolean updateLastAccessedAt() {
+    Authentication authentication =
+        SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+    Users guest = usersRepository.findByEmail(email).orElse(null);
+
+    if (guest == null) {
+      return false;
+    }
+    guest.setLastAccessedAt(LocalDateTime.now());
+
+    usersRepository.save(guest);
+
+    return true;
+  }
+
+  @Transactional
+  public void deleteCurrentGuestData() {
     Long guestId = getCurrentGuestId();
 
     deleteDemoData(guestId);

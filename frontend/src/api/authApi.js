@@ -9,12 +9,14 @@ export const login = async (email, password) => {
     credentials: "include",
     body: JSON.stringify({ email, password }),
   });
-
   if (!response.ok) {
-    if (response.status === 400 || response.status === 401) {
+    if (response.status === 401) {
       throw new Error("LOGIN_FAILED");
+    } else if (response.status === 400) {
+      throw new Error("LOGIN_REQUEST_INVALID");
+    } else {
+      throw new Error("LOGIN_REQUEST_FAILED");
     }
-    throw new Error("LOGIN_REQUEST_FAILED");
   }
   return await response.json();
 };
@@ -24,7 +26,6 @@ export const logout = async () => {
     method: "POST",
     credentials: "include",
   });
-
   if (!response.ok) {
     throw new Error("LOGOUT_FAILED");
   }
@@ -35,11 +36,9 @@ export const guestLogin = async () => {
     method: "POST",
     credentials: "include",
   });
-
   if (!response.ok) {
     throw new Error("GUEST_LOGIN_FAILED");
   }
-
   return await response.json();
 };
 
@@ -48,7 +47,6 @@ export const guestLogout = async () => {
     method: "POST",
     credentials: "include",
   });
-
   if (!response.ok) {
     throw new Error("GUEST_LOGOUT_FAILED");
   }
@@ -66,15 +64,14 @@ export const userRegister = async (
     credentials: "include",
     body: JSON.stringify({ email, password, confirmPassword, nickname }),
   });
-
   if (!response.ok) {
-    if (response.status === 409) {
-      throw new Error("EMAIL_ALREADY_EXISTS");
-    }
-    if (response.status === 400) {
+    if (response.status === 422) {
       throw new Error("PASSWORD_MISMATCH");
+    } else if (response.status === 409) {
+      throw new Error("EMAIL_ALREADY_EXISTS");
+    } else {
+      throw new Error("REGISTER_FAILED");
     }
-    throw new Error("REGISTER_FAILED");
   }
 };
 
@@ -97,9 +94,14 @@ export const updateUserRole = async (id, role) => {
     credentials: "include",
     body: JSON.stringify({ role }),
   });
-
   if (!response.ok) {
-    throw new Error("UPDATE_USER_ROLE_FAILED");
+    if (response.status === 409) {
+      throw new Error("ADMIN_ALREADY_EXISTS");
+    } else if (response.status === 404) {
+      throw new Error("USER_NOT_FOUND");
+    } else {
+      throw new Error("UPDATE_USER_ROLE_FAILED");
+    }
   }
 };
 
@@ -115,8 +117,11 @@ export const updateEmail = async (email) => {
   if (!response.ok) {
     if (response.status === 409) {
       throw new Error("EMAIL_ALREADY_EXISTS");
+    } else if (response.status === 400) {
+      throw new Error("EMAIL_REQUEST_INVALID");
+    } else {
+      throw new Error("UPDATE_EMAIL_FAILED");
     }
-    throw new Error("UPDATE_EMAIL_FAILED");
   }
   return await response.json();
 };
@@ -133,8 +138,11 @@ export const updatePassword = async (password) => {
   if (!response.ok) {
     if (response.status === 409) {
       throw new Error("SAME_PASSWORD");
+    } else if (response.status === 400) {
+      throw new Error("PASSWORD_REQUEST_INVALID");
+    } else {
+      throw new Error("UPDATE_PASSWORD_FAILED");
     }
-    throw new Error("UPDATE_PASSWORD_FAILED");
   }
 };
 
@@ -147,11 +155,12 @@ export const updateNickname = async (nickname) => {
     credentials: "include",
     body: JSON.stringify({ nickname }),
   });
-
   if (!response.ok) {
+    if (response.status === 400) {
+      throw new Error("NICKNAME_REQUEST_INVALID");
+    }
     throw new Error("NICKNAME_UPDATE_FAILED");
   }
-
   return await response.json();
 };
 

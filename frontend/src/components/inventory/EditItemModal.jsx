@@ -5,10 +5,11 @@ function EditItemModal({ item, categories, onClose, onItemChanged }) {
   const [name, setName] = useState(item.name);
   const [category, setCategory] = useState(String(item.category.id));
   const [currentStock, setCurrentStock] = useState(item.currentStock);
-  const [minStock, setMinStock] = useState(item.minStock);
   const [alertEnabled, setAlertEnabled] = useState(item.alertEnabled);
+  const [minStock, setMinStock] = useState(item.minStock ?? "");
+  const [sortOrder, setSortOrder] = useState(item.sortOrder ?? "");
   const [error, setError] = useState("");
-  const [sortOrder, setSortOrder] = useState(item.sortOrder);
+
   /**
    * 商品情報を更新する。
    *
@@ -26,24 +27,38 @@ function EditItemModal({ item, categories, onClose, onItemChanged }) {
       setError("※カテゴリを選択してください※");
       return;
     }
+    if (currentStock === "") {
+      setError("※現在の在庫数を入力してください※");
+      return;
+    }
+    if (alertEnabled && minStock === "") {
+      setError("※アラート数を入力してください※");
+      return;
+    }
     try {
       const updateItemData = {
         id: item.id,
         name: name.trim(),
         categoryId: Number(category),
-        currentStock: currentStock,
-        minStock,
+        currentStock: Number(currentStock),
+        minStock: minStock === "" ? null : Number(minStock),
         alertEnabled,
-        sortOrder,
+        sortOrder: sortOrder === "" ? null : Number(sortOrder),
       };
 
       await updateItem(updateItemData);
       await onItemChanged();
       onClose();
     } catch (error) {
-      if (error.message === "ITEM_FAILED") {
-        setError("※権限がありません※");
-      } else setError("※同じ商品名がすでに登録されています※");
+      if (error.message === "ITEM_NAME_ALREADY_EXISTS") {
+        setError("※同じ商品名がすでに登録されています※");
+      } else if (error.message === "ITEM_OR_CATEGORY_NOT_FOUND") {
+        setError("※商品またはカテゴリが見つかりません。※");
+      } else if (error.message === "ITEM_REQUEST_INVALID") {
+        setError("※入力内容に誤りがあります。※");
+      } else {
+        setError("※商品を登録できませんでした。※");
+      }
     }
   };
 
@@ -90,7 +105,7 @@ function EditItemModal({ item, categories, onClose, onItemChanged }) {
             type="number"
             min="0"
             value={currentStock}
-            onChange={(e) => setCurrentStock(Number(e.target.value))}
+            onChange={(e) => setCurrentStock(e.target.value)}
           />
         </label>
 
@@ -109,7 +124,7 @@ function EditItemModal({ item, categories, onClose, onItemChanged }) {
             type="number"
             min="0"
             value={minStock}
-            onChange={(e) => setMinStock(Number(e.target.value))}
+            onChange={(e) => setMinStock(e.target.value)}
           />
         </label>
 
@@ -119,7 +134,7 @@ function EditItemModal({ item, categories, onClose, onItemChanged }) {
             type="number"
             min="0"
             value={sortOrder}
-            onChange={(e) => setSortOrder(Number(e.target.value))}
+            onChange={(e) => setSortOrder(e.target.value)}
           />
           <p>※ 数字が小さいほど上に表示されます</p>
         </label>

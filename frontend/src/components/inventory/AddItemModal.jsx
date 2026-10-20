@@ -11,11 +11,12 @@ function AddItemModal({
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [currentStock, setCurrentStock] = useState("");
-  const [minStock, setMinStock] = useState("");
   const [alertEnabled, setAlertEnabled] = useState(true);
+  const [minStock, setMinStock] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
   const [error, setError] = useState("");
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
-  const [sortOrder, setSortOrder] = useState("");
+
   /**
    * 商品を登録する。
    *
@@ -33,23 +34,37 @@ function AddItemModal({
       setError("※カテゴリを選択してください※");
       return;
     }
+    if (currentStock === "") {
+      setError("※現在の在庫数を入力してください※");
+      return;
+    }
+    if (alertEnabled && minStock === "") {
+      setError("※アラート数を入力してください※");
+      return;
+    }
     try {
       const item = {
         name: name.trim(),
         categoryId: Number(category),
-        currentStock: currentStock,
-        minStock,
+        currentStock: Number(currentStock),
+        minStock: minStock === "" ? null : Number(minStock),
         alertEnabled,
-        sortOrder: sortOrder,
+        sortOrder: sortOrder === "" ? null : Number(sortOrder),
       };
 
       await createItem(item);
       await onItemCreated();
       onClose();
     } catch (error) {
-      if (error.message === "ITEM_FAILED") {
-        setError("※権限がありません※");
-      } else setError("※同じ商品名がすでに登録されています※");
+      if (error.message === "ITEM_NAME_ALREADY_EXISTS") {
+        setError("※同じ商品名がすでに登録されています※");
+      } else if (error.message === "CATEGORY_NOT_FOUND") {
+        setError("※カテゴリが見つかりません。※");
+      } else if (error.message === "ITEM_REQUEST_INVALID") {
+        setError("※入力内容に誤りがあります。※");
+      } else {
+        setError("※商品を登録できませんでした。※");
+      }
     }
   };
 
@@ -101,7 +116,7 @@ function AddItemModal({
             type="number"
             min="0"
             value={currentStock}
-            onChange={(e) => setCurrentStock(Number(e.target.value))}
+            onChange={(e) => setCurrentStock(e.target.value)}
           />
         </label>
 
@@ -120,7 +135,7 @@ function AddItemModal({
             type="number"
             min="0"
             value={minStock}
-            onChange={(e) => setMinStock(Number(e.target.value))}
+            onChange={(e) => setMinStock(e.target.value)}
           />
         </label>
 
@@ -130,7 +145,7 @@ function AddItemModal({
             type="number"
             min="0"
             value={sortOrder}
-            onChange={(e) => setSortOrder(Number(e.target.value))}
+            onChange={(e) => setSortOrder(e.target.value)}
           />
           <p>※ 数字が小さいほど上に表示されます</p>
         </label>

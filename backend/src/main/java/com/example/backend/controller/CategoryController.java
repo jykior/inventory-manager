@@ -5,6 +5,7 @@ import com.example.backend.dto.response.CategoryResponse;
 import com.example.backend.service.CategoryService;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,13 +23,10 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @RestController
 @RequestMapping("/api/categories")
+@RequiredArgsConstructor
 public class CategoryController {
 
   private final CategoryService categoryService;
-
-  public CategoryController(CategoryService categoryService) {
-    this.categoryService = categoryService;
-  }
 
   @GetMapping
   public List<CategoryResponse> getCategories() {
@@ -43,19 +41,22 @@ public class CategoryController {
       if ("CATEGORY_NAME_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
       }
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      throw e;
     }
   }
 
   @PutMapping("/{id}")
-  public CategoryResponse updateCategory(@PathVariable Long id,@Valid @RequestBody CategoryRequest categoryRequest) {
+  public CategoryResponse updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequest categoryRequest) {
     try {
       return categoryService.updateCategory(id, categoryRequest);
     } catch (IllegalArgumentException e) {
+      if ("CATEGORY_NOT_FOUND".equals(e.getMessage())){
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      }
       if ("CATEGORY_NAME_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
       }
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      throw e;
     }
   }
 
@@ -64,11 +65,12 @@ public class CategoryController {
     try {
       categoryService.deleteCategory(id);
     } catch (DataIntegrityViolationException e) {
-
       throw new ResponseStatusException(HttpStatus.CONFLICT);
     } catch (IllegalArgumentException e) {
-
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      if ("CATEGORY_NOT_FOUND".equals(e.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      }
+      throw e;
     }
   }
 }

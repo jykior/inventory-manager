@@ -22,6 +22,8 @@ function CategoryModal({ categories, allItems, onClose, onCategoriesChanged }) {
     } catch (error) {
       if (error.message === "CATEGORY_HAS_ITEMS") {
         setError("商品が登録されているため、このカテゴリは削除できません。");
+      } else if (error.message === "CATEGORY_NOT_FOUND") {
+        setError("※カテゴリが見つかりません。※");
       } else {
         setError("カテゴリの削除に失敗しました。");
       }

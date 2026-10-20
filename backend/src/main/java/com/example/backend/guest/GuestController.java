@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,7 +17,6 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * ゲストログイン・ログアウトに関するAPIを提供するコントローラークラス。
@@ -36,33 +34,27 @@ public class GuestController {
       HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse) {
 
-    try {
-      Users guest = guestService.guestLogin();
-      guestService.createDemoData(guest.getId());
+    Users guest = guestService.createGuestWithDemoData();
 
-      Authentication authentication = new UsernamePasswordAuthenticationToken(
-          guest.getEmail(),
-          null,
-          List.of(new SimpleGrantedAuthority("ROLE_GUEST"))
-      );
+    Authentication authentication = new UsernamePasswordAuthenticationToken(
+        guest.getEmail(),
+        null,
+        List.of(new SimpleGrantedAuthority("ROLE_GUEST"))
+    );
 
-      httpServletRequest.getSession(true);
-      httpServletRequest.changeSessionId();
+    httpServletRequest.getSession(true);
+    httpServletRequest.changeSessionId();
 
-      SecurityContext context = SecurityContextHolder.createEmptyContext();
-      context.setAuthentication(authentication);
-      SecurityContextHolder.setContext(context);
+    SecurityContext context = SecurityContextHolder.createEmptyContext();
+    context.setAuthentication(authentication);
 
-      securityContextRepository.saveContext(
-          context,
-          httpServletRequest,
-          httpServletResponse
-      );
+    securityContextRepository.saveContext(
+        context,
+        httpServletRequest,
+        httpServletResponse
+    );
 
-      return  UserResponse.from(guest);
-    } catch (IllegalArgumentException e) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT);
-    }
+    return UserResponse.from(guest);
   }
 
   @PostMapping("/logout")
@@ -70,7 +62,7 @@ public class GuestController {
     if (authentication != null) {
       for (GrantedAuthority authority : authentication.getAuthorities()) {
         if ("ROLE_GUEST".equals(authority.getAuthority())) {
-          guestService.deleteDemoData();
+          guestService.deleteCurrentGuestData();
           break;
         }
       }

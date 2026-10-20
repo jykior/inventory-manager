@@ -7,11 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-  boolean existsByNameAndIsDemoAndGuestId(String name, Boolean isDemo,Long guestId);
+  boolean existsByNameAndIsDemoAndGuestId(String name, Boolean isDemo, Long guestId);
 
-  List<Item> findAllByIsDemoAndGuestIdOrderBySortOrderAsc(Boolean isDemo,Long guestId);
+  boolean existsByNameAndIsDemoAndGuestIdAndIdNot(String name, Boolean isDemo, Long guestId, Long id);
 
-  Optional<Item> findByIdAndIsDemoAndGuestId(Long id, Boolean isDemo,Long guestId);
+  List<Item> findAllByIsDemoAndGuestIdOrderBySortOrderAsc(Boolean isDemo, Long guestId);
 
-  void deleteAllByIsDemoAndGuestId(Boolean isDemo,Long guestId);
+  Optional<Item> findByIdAndIsDemoAndGuestId(Long id, Boolean isDemo, Long guestId);
+
+  void deleteAllByIsDemoAndGuestId(Boolean isDemo, Long guestId);
 }

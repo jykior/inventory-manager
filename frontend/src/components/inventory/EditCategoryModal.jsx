@@ -39,9 +39,15 @@ function EditCategoryModal({ category, onClose, onCategoryChanged }) {
       await onCategoryChanged();
       onClose();
     } catch (error) {
-      if (error.message === "CATEGORY_FAILED") {
-        setError("※権限がありません※");
-      } else setError("※同じカテゴリ名がすでに登録されています※");
+      if (error.message === "CATEGORY_NAME_ALREADY_EXISTS") {
+        setError("※同じカテゴリ名がすでに登録されています※");
+      } else if (error.message === "CATEGORY_NOT_FOUND") {
+        setError("※カテゴリが見つかりません。※");
+      } else if (error.message === "CATEGORY_REQUEST_INVALID") {
+        setError("※入力内容に誤りがあります。※");
+      } else {
+        setError("※カテゴリを登録できませんでした。※");
+      }
     }
   };
 

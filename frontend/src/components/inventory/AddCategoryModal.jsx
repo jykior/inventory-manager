@@ -14,31 +14,35 @@ function AddCategoryModal({ onClose, onCategoryCreated }) {
     "rgba(218, 133, 212,0.5)",
     "rgba(237, 127, 18,0.5)",
   ];
-/**
- * カテゴリを登録する。
- *
- * 入力内容をチェックし、
- * カテゴリを作成した後に一覧を更新する。
- */
+  /**
+   * カテゴリを登録する。
+   *
+   * 入力内容をチェックし、
+   * カテゴリを作成した後に一覧を更新する。
+   */
   const handleSubmit = async () => {
     if (!name.trim()) {
       setError("※カテゴリ名を入力してください※");
       return;
     }
 
-  if (!colorCode) {
-    setError("※カテゴリカラーを選択してください※");
-    return;
-  }
+    if (!colorCode) {
+      setError("※カテゴリカラーを選択してください※");
+      return;
+    }
 
     try {
       await createCategory({ name: name.trim(), colorCode: colorCode });
       await onCategoryCreated();
       onClose();
     } catch (error) {
-      if (error.message === "CATEGORY_FAILED") {
-        setError("※権限がありません※");
-      } else setError("※同じカテゴリ名がすでに登録されています※");
+      if (error.message === "CATEGORY_NAME_ALREADY_EXISTS") {
+        setError("※同じカテゴリ名がすでに登録されています※");
+      } else if (error.message === "CATEGORY_REQUEST_INVALID") {
+        setError("※入力内容に誤りがあります。※");
+      } else {
+        setError("※カテゴリを登録できませんでした。※");
+      }
     }
   };
 
@@ -47,7 +51,9 @@ function AddCategoryModal({ onClose, onCategoryCreated }) {
       <div className="category-form-modal">
         <div className="category-form-modal-header">
           <h2>カテゴリを追加</h2>
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         {error && <p className="form-error">{error}</p>}

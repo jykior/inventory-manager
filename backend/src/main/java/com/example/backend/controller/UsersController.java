@@ -62,7 +62,6 @@ public class UsersController {
 
       SecurityContext context = SecurityContextHolder.createEmptyContext();
       context.setAuthentication(authentication);
-      SecurityContextHolder.setContext(context);
 
       securityContextRepository.saveContext(
           context,
@@ -99,7 +98,10 @@ public class UsersController {
       if ("EMAIL_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
       }
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      if ("PASSWORD_MISMATCH".equals(e.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT);
+      }
+      throw e;
     }
   }
 
@@ -121,7 +123,6 @@ public class UsersController {
 
       SecurityContext context = SecurityContextHolder.createEmptyContext();
       context.setAuthentication(newAuthentication);
-      SecurityContextHolder.setContext(context);
 
       securityContextRepository.saveContext(
           context,
@@ -134,7 +135,7 @@ public class UsersController {
       if ("EMAIL_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
       }
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      throw e;
     }
   }
 
@@ -148,7 +149,7 @@ public class UsersController {
       if ("SAME_PASSWORD".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
       }
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      throw e;
     }
   }
 
@@ -165,6 +166,23 @@ public class UsersController {
     return UserResponse.from(users);
   }
 
+  @DeleteMapping
+  public void delete(Authentication authentication, HttpServletRequest request) {
+    usersService.delete(authentication.getName());
+
+    SecurityContextHolder.clearContext();
+
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.invalidate();
+    }
+  }
+
+  @GetMapping("/users")
+  public List<UserRoleResponse> findAll() {
+    return usersService.findAllRoles();
+  }
+
   @PatchMapping("/{id}/role")
   public void updateRole(@PathVariable Long id, @Valid @RequestBody RoleRequest roleRequest) {
     try {
@@ -173,17 +191,10 @@ public class UsersController {
       if ("ADMIN_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
       }
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      if ("USER_NOT_FOUND".equals(e.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      }
+      throw e;
     }
-  }
-
-  @DeleteMapping
-  public void delete(Authentication authentication) {
-    usersService.delete(authentication.getName());
-  }
-
-  @GetMapping("/users")
-  public List<UserRoleResponse> findAll() {
-    return usersService.findAllRoles();
   }
 }

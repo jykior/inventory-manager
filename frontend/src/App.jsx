@@ -65,16 +65,19 @@ function App() {
    * ログイン状態をリセットする。
    */
   const handleLogout = async () => {
-    if (user?.role === "GUEST") {
-      await guestLogout();
-    } else {
-      await logout();
+    try {
+      if (user?.role === "GUEST") {
+        await guestLogout();
+      } else {
+        await logout();
+      }
+    } catch {
+    } finally {
+      sessionStorage.removeItem("user");
+      setUser(null);
+      setIsLoggedIn(false);
+      setCurrentPage("home");
     }
-
-    sessionStorage.removeItem("user");
-    setUser(null);
-    setIsLoggedIn(false);
-    setCurrentPage("home");
   };
 
   const handleUserUpdated = (updatedUser) => {
@@ -86,6 +89,7 @@ function App() {
     sessionStorage.removeItem("user");
     setUser(null);
     setIsLoggedIn(false);
+    setCurrentPage("home");
   };
 
   /**
@@ -140,6 +144,7 @@ function App() {
                 onItemsChanged={fetchItems}
                 onCategoriesChanged={fetchCategories}
                 initialStatus={initialStatus}
+                user={user}
               />
             </>
           )}

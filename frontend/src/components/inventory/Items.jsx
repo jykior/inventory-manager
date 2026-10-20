@@ -14,9 +14,10 @@ function Items({
   onItemsChanged,
   onCategoriesChanged,
   initialStatus,
+  user,
 }) {
   const [displayItems, setDisplayItems] = useState([]);
-  const [isSelected, setIsSelected] = useState(null);
+  const [selectedItemId, setSelectedItemId] = useState(null);
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
@@ -44,22 +45,25 @@ function Items({
           商品一覧
         </h1>
         <div className="items-header-actions">
-          <button
-            className="category-button"
-            onClick={async () => {
-              await onCategoriesChanged();
-              setIsCategoryModalOpen(true);
-            }}
-          >
-            カテゴリ管理
-          </button>
-
-          <button
-            className="item-add-button"
-            onClick={() => setIsAddItemModalOpen(true)}
-          >
-            ＋ 商品を追加
-          </button>
+          {user?.role !== "STAFF" && (
+            <button
+              className="category-button"
+              onClick={async () => {
+                await onCategoriesChanged();
+                setIsCategoryModalOpen(true);
+              }}
+            >
+              カテゴリ管理
+            </button>
+          )}
+          {user?.role !== "STAFF" && (
+            <button
+              className="item-add-button"
+              onClick={() => setIsAddItemModalOpen(true)}
+            >
+              ＋ 商品を追加
+            </button>
+          )}
         </div>
       </div>
 
@@ -87,10 +91,11 @@ function Items({
               key={item.id}
               item={item}
               categories={categories}
-              isSelected={isSelected === item.id}
-              onSelectItem={setIsSelected}
+              isSelected={selectedItemId === item.id}
+              onSelectItem={setSelectedItemId}
               onUpdateStock={onUpdateStock}
               onItemsChanged={onItemsChanged}
+              user={user}
             />
           ))}
         </tbody>

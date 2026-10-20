@@ -36,18 +36,12 @@ public class UsersService {
     return usersRepository.findByEmail(email).orElseThrow();
   }
 
-  public void delete(String email) {
-    Users users = usersRepository.findByEmail(email).orElseThrow();
-
-    usersRepository.delete(users);
-  }
-
   public Users register(RegisterRequest registerRequest) {
     if (usersRepository.existsByEmail(registerRequest.getEmail())) {
       throw new IllegalArgumentException("EMAIL_ALREADY_EXISTS");
     }
     if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("PASSWORD_MISMATCH");
     }
     Users users = new Users();
 
@@ -92,19 +86,30 @@ public class UsersService {
     return usersRepository.save(users);
   }
 
+  public List<UserRoleResponse> findAllRoles() {
+    return usersRepository.findAll()
+        .stream()
+        .filter(user -> !"GUEST".equals(user.getRole()))
+        .map(UserRoleResponse::from)
+        .toList();
+  }
+
   public void updateRole(Long id, String role) {
     if ("ADMIN".equals(role) && usersRepository.existsByRole("ADMIN")) {
       throw new IllegalArgumentException("ADMIN_ALREADY_EXISTS");
     }
 
-    Users users = usersRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+    Users users = usersRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("USER_NOT_FOUND"));
 
     users.setRole(role);
 
     usersRepository.save(users);
   }
 
-  public List<UserRoleResponse> findAllRoles() {
-    return usersRepository.findAll().stream().map(UserRoleResponse::from).toList();
+  public void delete(String email) {
+    Users users = usersRepository.findByEmail(email).orElseThrow();
+
+    usersRepository.delete(users);
   }
 }

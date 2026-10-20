@@ -10,10 +10,11 @@ import com.example.backend.repository.CategoryRepository;
 import com.example.backend.repository.ItemRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * 在庫商品の取得や管理を行うサービスクラス。
@@ -46,7 +47,7 @@ public class ItemService {
     }
 
     Category category = categoryRepository.findByIdAndIsDemoAndGuestId(itemRequest.getCategoryId(), isDemo, guestId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> new IllegalArgumentException("CATEGORY_NOT_FOUND"));
 
     Item item = new Item();
     item.setName(itemRequest.getName());
@@ -61,28 +62,22 @@ public class ItemService {
     return ItemResponse.from(itemRepository.save(item));
   }
 
-  public void deleteItem(Long id) {
-    Long guestId = guestService.getGuestIdOrNull();
-    boolean isDemo = guestId != null;
-
-    Item item = itemRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
-        .orElseThrow(IllegalArgumentException::new);
-
-    itemRepository.delete(item);
-  }
-
   public ItemResponse updateItem(Long id, ItemRequest itemRequest) {
     Long guestId = guestService.getGuestIdOrNull();
     boolean isDemo = guestId != null;
 
     Item item = itemRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> new IllegalArgumentException("ITEM_NOT_FOUND"));
+
+    if (itemRepository.existsByNameAndIsDemoAndGuestIdAndIdNot(itemRequest.getName(), isDemo, guestId, id)) {
+      throw new IllegalArgumentException("ITEM_NAME_ALREADY_EXISTS");
+    }
 
     item.setName(itemRequest.getName());
 
     Category category = categoryRepository.
         findByIdAndIsDemoAndGuestId(itemRequest.getCategoryId(), isDemo, guestId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> new IllegalArgumentException("CATEGORY_NOT_FOUND"));
 
     item.setCategory(category);
     item.setCurrentStock(itemRequest.getCurrentStock());
@@ -98,10 +93,34 @@ public class ItemService {
     boolean isDemo = guestId != null;
 
     Item item = itemRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> new IllegalArgumentException("ITEM_NOT_FOUND"));
+
+    boolean isStaff = false;
+
+    for (GrantedAuthority authority :
+        SecurityContextHolder.getContext().getAuthentication().getAuthorities()) {
+      if ("ROLE_STAFF".equals(authority.getAuthority())) {
+        isStaff = true;
+        break;
+      }
+    }
+
+    if (isStaff && newStock > item.getCurrentStock()) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
 
     item.setCurrentStock(newStock);
 
     return ItemResponse.from(itemRepository.save(item));
+  }
+
+  public void deleteItem(Long id) {
+    Long guestId = guestService.getGuestIdOrNull();
+    boolean isDemo = guestId != null;
+
+    Item item = itemRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
+        .orElseThrow(() -> new IllegalArgumentException("ITEM_NOT_FOUND"));
+
+    itemRepository.delete(item);
   }
 }

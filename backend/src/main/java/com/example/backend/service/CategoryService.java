@@ -7,9 +7,6 @@ import com.example.backend.guest.GuestService;
 import com.example.backend.repository.CategoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -56,7 +53,7 @@ public class CategoryService {
 
     Category existingCategory =
         categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
-            .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(()->new IllegalArgumentException("CATEGORY_NOT_FOUND"));
 
     if (!existingCategory.getName().equals(categoryRequest.getName())
         && categoryRepository.existsByNameAndIsDemoAndGuestId(
@@ -77,9 +74,8 @@ public class CategoryService {
     Long guestId = guestService.getGuestIdOrNull();
     boolean isDemo = guestId != null;
 
-    Category category =
-        categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
-            .orElseThrow(IllegalArgumentException::new);
+    Category category = categoryRepository.findByIdAndIsDemoAndGuestId(id, isDemo, guestId)
+            .orElseThrow(()->new IllegalArgumentException("CATEGORY_NOT_FOUND"));
 
     categoryRepository.delete(category);
   }

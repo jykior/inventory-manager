@@ -38,10 +38,10 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
       onRegisterSuccess();
       onClose();
     } catch (error) {
-      if (error.message === "EMAIL_ALREADY_EXISTS") {
-        setMessage("このメールアドレスはすでに登録されています");
-      } else if (error.message === "PASSWORD_MISMATCH") {
+      if (error.message === "PASSWORD_MISMATCH") {
         setMessage("パスワードが一致しません");
+      } else if (error.message === "EMAIL_ALREADY_EXISTS") {
+        setMessage("このメールアドレスはすでに登録されています");
       } else {
         setMessage("ユーザー登録に失敗しました");
       }
@@ -130,14 +130,7 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
         {message && <p className="user-register-error">{message}</p>}
 
         <button onClick={handleRegister}>登録</button>
-        <button
-          onClick={onClose}
-          onRegisterSuccess={() =>
-            setRegisterMessage("ユーザー登録が完了しました。")
-          }
-        >
-          閉じる
-        </button>
+        <button onClick={onClose}>閉じる</button>
       </div>
     </div>
   );

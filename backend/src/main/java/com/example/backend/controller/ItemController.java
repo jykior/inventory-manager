@@ -42,16 +42,10 @@ public class ItemController {
       if ("ITEM_NAME_ALREADY_EXISTS".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
       }
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @DeleteMapping("/{id}")
-  public void deleteItem(@PathVariable Long id) {
-    try {
-      itemService.deleteItem(id);
-    } catch (IllegalArgumentException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      if ("CATEGORY_NOT_FOUND".equals(e.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      }
+      throw e;
     }
   }
 
@@ -60,7 +54,13 @@ public class ItemController {
     try {
       return itemService.updateItem(id, itemRequest);
     } catch (IllegalArgumentException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      if ("ITEM_NOT_FOUND".equals(e.getMessage()) || "CATEGORY_NOT_FOUND".equals(e.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      }
+      if ("ITEM_NAME_ALREADY_EXISTS".equals(e.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT);
+      }
+      throw e;
     }
   }
 
@@ -69,7 +69,22 @@ public class ItemController {
     try {
       return itemService.updateStock(id, stockUpdateRequest.getCurrentStock());
     } catch (IllegalArgumentException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      if ("ITEM_NOT_FOUND".equals(e.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      }
+      throw e;
+    }
+  }
+
+  @DeleteMapping("/{id}")
+  public void deleteItem(@PathVariable Long id) {
+    try {
+      itemService.deleteItem(id);
+    } catch (IllegalArgumentException e) {
+      if ("ITEM_NOT_FOUND".equals(e.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      }
+      throw e;
     }
   }
 }

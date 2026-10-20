@@ -32,7 +32,7 @@ function Sidebar({ currentPage, setCurrentPage, setInitialStatus, user }) {
         </button>
         {user?.role === "ADMIN" && (
           <button
-            className={currentPage === "users" ? "active" : ""}
+            className={currentPage === "admin" ? "active" : ""}
             onClick={() => setCurrentPage("admin")}
           >
             <UserStar size={24} /> ユーザー管理

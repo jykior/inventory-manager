@@ -44,14 +44,15 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
       onUserUpdated(updatedUser);
       setEmail("");
       setIsEmailModalOpen(false);
-      showMessage("パスワードを変更しました", "success");
+      showMessage("メールアドレスを変更しました", "success");
     } catch (error) {
       if (error.message === "EMAIL_ALREADY_EXISTS") {
         showMessage("このメールアドレスはすでに登録されています", "error");
-        return;
+      } else if (error.message === "EMAIL_REQUEST_INVALID") {
+        showMessage("正しいメールアドレスを入力してください", "error");
+      } else {
+        showMessage("メールアドレスの変更に失敗しました", "error");
       }
-
-      showMessage("メールアドレスの変更に失敗しました", "error");
     }
   };
 
@@ -79,10 +80,11 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
     } catch (error) {
       if (error.message === "SAME_PASSWORD") {
         showMessage("現在と同じパスワードは設定できません", "error");
-        return;
+      } else if (error.message === "PASSWORD_REQUEST_INVALID") {
+        showMessage("正しいパスワードを入力してください", "error");
+      } else {
+        showMessage("パスワードの変更に失敗しました", "error");
       }
-
-      showMessage("パスワードの変更に失敗しました", "error");
     }
   };
 
@@ -100,17 +102,26 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
 
       showMessage("ニックネームを変更しました", "success");
     } catch (error) {
-      showMessage("ニックネームの変更に失敗しました", "error");
+      if (error.message === "NICKNAME_REQUEST_INVALID") {
+        showMessage("ニックネームを入力してください", "error");
+      } else {
+        showMessage("ニックネームの変更に失敗しました", "error");
+      }
     }
   };
 
   const handleDeleteAccount = async () => {
-    if (user?.role === "GUEST") {
-      await guestLogout();
-    } else {
-      await deleteAccount();
+    try {
+      if (user?.role === "GUEST") {
+        await guestLogout();
+      } else {
+        await deleteAccount();
+      }
+      onAccountDeleted();
+    } catch {
+      showMessage("退会に失敗しました", "error");
+      setIsDeleteAccountModalOpen(false);
     }
-    onAccountDeleted();
   };
 
   return (
@@ -320,16 +331,8 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
             <span className="setting-icon">
               <Megaphone size={24} />
             </span>
-            <h2>通知設定</h2>
+            <h2>※未実装※メール通知設定</h2>
           </div>
-          <div className="setting-item">
-            <span className="setting-label">通知方法</span>
-            <select className="setting-alert">
-              <option value="">アプリ内通知</option>
-              <option value="">メール通知</option>
-            </select>
-          </div>
-
           <div className="setting-item">
             <span className="setting-label">通知状態</span>
             <select className="setting-alert">

@@ -14,6 +14,7 @@ function ItemCard({
   onSelectItem,
   onUpdateStock,
   onItemsChanged,
+  user,
 }) {
   const [stockChange, setStockChange] = useState(0);
   const [isDeleteItemModalOpen, setIsDeleteItemModalOpen] = useState(false);
@@ -21,16 +22,33 @@ function ItemCard({
   const [isStockInModalOpen, setIsStockInModalOpen] = useState(false);
 
   const handleStockChange = async (item, newStock) => {
-    const updatedStock = await updateStockApi(item, newStock);
-
-    onUpdateStock(updatedStock);
+    try {
+      const updatedStock = await updateStockApi(item, newStock);
+      onUpdateStock(updatedStock);
+    } catch (error) {
+      if (error.message === "ITEM_NOT_FOUND") {
+        alert("商品が見つかりません。");
+      } else if (error.message === "STOCK_REQUEST_INVALID") {
+        alert("在庫数の入力内容を確認してください。");
+      } else {
+        alert("在庫数の更新に失敗しました。");
+      }
+    }
   };
 
   const handleDeleteItem = async () => {
-    await deleteItem(item.id);
-    await onItemsChanged();
+    try {
+      await deleteItem(item.id);
+      await onItemsChanged();
 
-    setIsDeleteItemModalOpen(false);
+      setIsDeleteItemModalOpen(false);
+    } catch (error) {
+      if (error.message === "ITEM_NOT_FOUND") {
+        alert("商品が見つかりません。");
+      } else {
+        alert("商品の削除に失敗しました。");
+      }
+    }
   };
 
   const status = getStockStatus(item);
@@ -93,7 +111,7 @@ function ItemCard({
               )}
               <span>{item.currentStock}</span>
             </span>
-            {isSelected && (
+            {isSelected && user?.role !== "STAFF" &&(
               <button
                 className="stock-control"
                 onClick={(e) => {
@@ -130,7 +148,7 @@ function ItemCard({
         </td>
 
         <td>
-          {isSelected && (
+          {isSelected && user?.role !== "STAFF" && (
             <div className="item-actions">
               <button
                 className="item-stock-in-button"
