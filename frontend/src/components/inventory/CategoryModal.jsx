@@ -9,23 +9,30 @@ function CategoryModal({ categories, allItems, onClose, onCategoriesChanged }) {
   const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] =
     useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState({ text: "", type: "" });
 
+  const showMessage = (text, type) => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: "", type: "" }), 5000);
+  };
   const handleDeleteCategory = async () => {
-    setError("");
     try {
       await deleteCategory(selectedCategory.id);
       await onCategoriesChanged();
 
       setIsDeleteCategoryModalOpen(false);
       setSelectedCategory(null);
+      showMessage("◎カテゴリを削除しました","success")
     } catch (error) {
       if (error.message === "CATEGORY_HAS_ITEMS") {
-        setError("商品が登録されているため、このカテゴリは削除できません。");
+        showMessage(
+          "※商品が登録されているため、このカテゴリは削除できません※",
+          "error",
+        );
       } else if (error.message === "CATEGORY_NOT_FOUND") {
-        setError("※カテゴリが見つかりません。※");
+        showMessage("※カテゴリが見つかりません※", "error");
       } else {
-        setError("カテゴリの削除に失敗しました。");
+        showMessage("※カテゴリの削除に失敗しました※", "error");
       }
     }
   };
@@ -38,12 +45,15 @@ function CategoryModal({ categories, allItems, onClose, onCategoriesChanged }) {
             <h2>カテゴリ管理</h2>
             <p>カテゴリの追加・編集・削除ができます。</p>
           </div>
-
           <button className="close-button" onClick={onClose}>
             ×
           </button>
         </div>
-
+        <div className="message-area">
+          {message.text && (
+            <p className={`message ${message.type}`}>{message.text}</p>
+          )}
+        </div>
         <div className="category-table-wrapper">
           <table className="category-table">
             <thead>
@@ -112,6 +122,7 @@ function CategoryModal({ categories, allItems, onClose, onCategoriesChanged }) {
         <AddCategoryModal
           onClose={() => setIsAddCategoryModalOpen(false)}
           onCategoryCreated={onCategoriesChanged}
+          onMessage={showMessage}
         />
       )}
 
@@ -124,6 +135,7 @@ function CategoryModal({ categories, allItems, onClose, onCategoriesChanged }) {
             setSelectedCategory(null);
           }}
           onCategoryChanged={onCategoriesChanged}
+          onMessage={showMessage}
         />
       )}
 
@@ -131,9 +143,6 @@ function CategoryModal({ categories, allItems, onClose, onCategoriesChanged }) {
         <div className="modal-overlay">
           <div className="delete-modal">
             <h3>このカテゴリを削除しますか？</h3>
-
-            {error && <p className="form-error">{error}</p>}
-
             <div className="delete-modal-buttons">
               <button onClick={() => setIsDeleteCategoryModalOpen(false)}>
                 キャンセル
@@ -141,7 +150,10 @@ function CategoryModal({ categories, allItems, onClose, onCategoriesChanged }) {
 
               <button
                 className="delete-confirm-button"
-                onClick={handleDeleteCategory}
+                onClick={() => {
+                  setIsDeleteCategoryModalOpen(false);
+                  handleDeleteCategory();
+                }}
               >
                 削除する
               </button>

@@ -31,12 +31,12 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
 
   const handleUpdateEmail = async () => {
     if (!email.trim()) {
-      showMessage("メールアドレスを入力してください", "error");
+      showMessage("※メールアドレスを入力してください※", "error");
       return;
     }
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailPattern.test(email)) {
-      showMessage("正しいメールアドレスを入力してください", "error");
+      showMessage("※正しいメールアドレスを入力してください※", "error");
       return;
     }
     try {
@@ -44,30 +44,30 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
       onUserUpdated(updatedUser);
       setEmail("");
       setIsEmailModalOpen(false);
-      showMessage("メールアドレスを変更しました", "success");
+      showMessage("◎メールアドレスを変更しました", "success");
     } catch (error) {
       if (error.message === "EMAIL_ALREADY_EXISTS") {
-        showMessage("このメールアドレスはすでに登録されています", "error");
+        showMessage("※このメールアドレスはすでに登録されています※", "error");
       } else if (error.message === "EMAIL_REQUEST_INVALID") {
-        showMessage("正しいメールアドレスを入力してください", "error");
+        showMessage("※正しいメールアドレスを入力してください※", "error");
       } else {
-        showMessage("メールアドレスの変更に失敗しました", "error");
+        showMessage("※メールアドレスの変更に失敗しました※", "error");
       }
     }
   };
 
   const handleUpdatePassword = async () => {
     if (!password || !confirmPassword) {
-      showMessage("未入力の項目があります", "error");
+      showMessage("※未入力の項目があります※", "error");
       return;
     }
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#]{6,}$/;
     if (!passwordPattern.test(password)) {
-      showMessage("パスワードは6文字以上の英数字で入力してください", "error");
+      showMessage("※パスワードは6文字以上の英数字で入力してください※", "error");
       return;
     }
     if (password !== confirmPassword) {
-      showMessage("パスワードが一致していません", "error");
+      showMessage("※パスワードが一致していません※", "error");
       return;
     }
     try {
@@ -76,21 +76,21 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
       setPassword("");
       setConfirmPassword("");
       setIsPasswordModalOpen(false);
-      showMessage("パスワードを変更しました", "success");
+      showMessage("◎パスワードを変更しました", "success");
     } catch (error) {
       if (error.message === "SAME_PASSWORD") {
-        showMessage("現在と同じパスワードは設定できません", "error");
+        showMessage("※現在と同じパスワードは設定できません※", "error");
       } else if (error.message === "PASSWORD_REQUEST_INVALID") {
-        showMessage("正しいパスワードを入力してください", "error");
+        showMessage("※正しいパスワードを入力してください※", "error");
       } else {
-        showMessage("パスワードの変更に失敗しました", "error");
+        showMessage("※パスワードの変更に失敗しました※", "error");
       }
     }
   };
 
   const handleUpdateNickname = async () => {
     if (!nickname.trim()) {
-      showMessage("ニックネームを入力してください", "error");
+      showMessage("※ニックネームを入力してください※", "error");
       return;
     }
 
@@ -100,12 +100,12 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
       setNickname("");
       setIsNicknameModalOpen(false);
 
-      showMessage("ニックネームを変更しました", "success");
+      showMessage("◎ニックネームを変更しました", "success");
     } catch (error) {
       if (error.message === "NICKNAME_REQUEST_INVALID") {
-        showMessage("ニックネームを入力してください", "error");
+        showMessage("※ニックネームを入力してください※", "error");
       } else {
-        showMessage("ニックネームの変更に失敗しました", "error");
+        showMessage("※ニックネームの変更に失敗しました※", "error");
       }
     }
   };
@@ -199,13 +199,14 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
                 />
 
                 {message.type === "error" && (
-                  <p className="password-message">{message.text}</p>
+                  <p className="error-message">{message.text}</p>
                 )}
 
                 <div className="account-modal-buttons">
                   <button
                     onClick={() => {
                       setEmail("");
+                      setMessage({ text: "", type: "" });
                       setIsEmailModalOpen(false);
                     }}
                   >
@@ -249,11 +250,18 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
                 />
 
                 {message.type === "error" && (
-                  <p className="password-message">{message.text}</p>
+                  <p className="error-message">{message.text}</p>
                 )}
 
                 <div className="account-modal-buttons">
-                  <button onClick={() => setIsPasswordModalOpen(false)}>
+                  <button
+                    onClick={() => {
+                      setPassword("");
+                      setConfirmPassword("");
+                      setMessage({ text: "", type: "" });
+                      setIsPasswordModalOpen(false);
+                    }}
+                  >
                     キャンセル
                   </button>
 
@@ -282,13 +290,14 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
                 />
 
                 {message.type === "error" && (
-                  <p className="password-message">{message.text}</p>
+                  <p className="error-message">{message.text}</p>
                 )}
 
                 <div className="account-modal-buttons">
                   <button
                     onClick={() => {
                       setNickname("");
+                      setMessage({ text: "", type: "" });
                       setIsNicknameModalOpen(false);
                     }}
                   >
@@ -310,8 +319,18 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
             <div className="modal-overlay">
               <div className="delete-modal">
                 <h3>本当に退会しますか？</h3>
+
+                {message.type === "error" && (
+                  <p className="error-message">{message.text}</p>
+                )}
+                
                 <div className="delete-modal-buttons">
-                  <button onClick={() => setIsDeleteAccountModalOpen(false)}>
+                  <button
+                    onClick={() => {
+                      setMessage({ text: "", type: "" });
+                      setIsDeleteAccountModalOpen(false);
+                    }}
+                  >
                     キャンセル
                   </button>
                   <button

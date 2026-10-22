@@ -15,6 +15,7 @@ function ItemCard({
   onUpdateStock,
   onItemsChanged,
   user,
+  onMessage,
 }) {
   const [stockChange, setStockChange] = useState(0);
   const [isDeleteItemModalOpen, setIsDeleteItemModalOpen] = useState(false);
@@ -25,13 +26,14 @@ function ItemCard({
     try {
       const updatedStock = await updateStockApi(item, newStock);
       onUpdateStock(updatedStock);
+      onMessage("◎在庫数を変更しました", "success");
     } catch (error) {
       if (error.message === "ITEM_NOT_FOUND") {
-        alert("商品が見つかりません。");
+        onMessage("※商品が見つかりません※", "error");
       } else if (error.message === "STOCK_REQUEST_INVALID") {
-        alert("在庫数の入力内容を確認してください。");
+        onMessage("※在庫数の入力内容を確認してください※", "error");
       } else {
-        alert("在庫数の更新に失敗しました。");
+        onMessage("※在庫数の更新に失敗しました※", "error");
       }
     }
   };
@@ -42,11 +44,12 @@ function ItemCard({
       await onItemsChanged();
 
       setIsDeleteItemModalOpen(false);
+      onMessage("◎商品を削除しました", "success");
     } catch (error) {
       if (error.message === "ITEM_NOT_FOUND") {
-        alert("商品が見つかりません。");
+        onMessage("商品が見つかりません", "error");
       } else {
-        alert("商品の削除に失敗しました。");
+        onMessage("商品の削除に失敗しました", "error");
       }
     }
   };
@@ -111,7 +114,7 @@ function ItemCard({
               )}
               <span>{item.currentStock}</span>
             </span>
-            {isSelected && user?.role !== "STAFF" &&(
+            {isSelected && user?.role !== "STAFF" && (
               <button
                 className="stock-control"
                 onClick={(e) => {
@@ -191,6 +194,7 @@ function ItemCard({
               setIsEditItemModalOpen(false);
             }}
             onItemChanged={onItemsChanged}
+            onMessage={onMessage}
           />,
           document.body,
         )}
@@ -286,7 +290,6 @@ function ItemCard({
           <div className="modal-overlay">
             <div className="delete-modal">
               <h3>この商品を削除しますか？</h3>
-
               <div className="delete-modal-buttons">
                 <button onClick={() => setIsDeleteItemModalOpen(false)}>
                   キャンセル

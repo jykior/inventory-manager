@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createCategory } from "../../api/itemApi";
 
-function AddCategoryModal({ onClose, onCategoryCreated }) {
+function AddCategoryModal({ onClose, onCategoryCreated, onMessage }) {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [colorCode, setColorCode] = useState();
@@ -14,6 +14,10 @@ function AddCategoryModal({ onClose, onCategoryCreated }) {
     "rgba(218, 133, 212,0.5)",
     "rgba(237, 127, 18,0.5)",
   ];
+  const errorMessage = (text) => {
+    setError(text);
+    setTimeout(() => setError(""), 5000);
+  };
   /**
    * カテゴリを登録する。
    *
@@ -22,26 +26,25 @@ function AddCategoryModal({ onClose, onCategoryCreated }) {
    */
   const handleSubmit = async () => {
     if (!name.trim()) {
-      setError("※カテゴリ名を入力してください※");
+      errorMessage("※カテゴリ名を入力してください※");
       return;
     }
-
     if (!colorCode) {
-      setError("※カテゴリカラーを選択してください※");
+      errorMessage("※カテゴリカラーを選択してください※");
       return;
     }
-
     try {
       await createCategory({ name: name.trim(), colorCode: colorCode });
       await onCategoryCreated();
       onClose();
+      onMessage("◎カテゴリを追加しました", "success");
     } catch (error) {
       if (error.message === "CATEGORY_NAME_ALREADY_EXISTS") {
-        setError("※同じカテゴリ名がすでに登録されています※");
+        errorMessage("※同じカテゴリ名がすでに登録されています※");
       } else if (error.message === "CATEGORY_REQUEST_INVALID") {
-        setError("※入力内容に誤りがあります。※");
+        errorMessage("※入力内容に誤りがあります。※");
       } else {
-        setError("※カテゴリを登録できませんでした。※");
+        errorMessage("※カテゴリを登録できませんでした。※");
       }
     }
   };
@@ -56,7 +59,7 @@ function AddCategoryModal({ onClose, onCategoryCreated }) {
           </button>
         </div>
 
-        {error && <p className="form-error">{error}</p>}
+        {error && <p className="error-message">{error}</p>}
 
         <label>
           カテゴリ名<span className="required"> *</span>

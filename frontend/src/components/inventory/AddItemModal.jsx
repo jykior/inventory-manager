@@ -7,6 +7,7 @@ function AddItemModal({
   onClose,
   onItemCreated,
   onCategoriesChanged,
+  onMessage,
 }) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
@@ -14,9 +15,13 @@ function AddItemModal({
   const [alertEnabled, setAlertEnabled] = useState(true);
   const [minStock, setMinStock] = useState("");
   const [sortOrder, setSortOrder] = useState("");
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState({ text: "", type: "" });
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
 
+  const showMessage = (text, type) => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: "", type: "" }), 5000);
+  };
   /**
    * 商品を登録する。
    *
@@ -24,22 +29,20 @@ function AddItemModal({
    * 商品を作成した後に商品一覧を更新する。
    */
   const handleSubmit = async () => {
-    setError("");
-
     if (!name.trim()) {
-      setError("※商品名を入力してください※");
+      showMessage("※商品名を入力してください※", "error");
       return;
     }
     if (!category) {
-      setError("※カテゴリを選択してください※");
+      showMessage("※カテゴリを選択してください※", "error");
       return;
     }
     if (currentStock === "") {
-      setError("※現在の在庫数を入力してください※");
+      showMessage("※現在の在庫数を入力してください※", "error");
       return;
     }
     if (alertEnabled && minStock === "") {
-      setError("※アラート数を入力してください※");
+      showMessage("※アラート数を入力してください※", "error");
       return;
     }
     try {
@@ -55,15 +58,16 @@ function AddItemModal({
       await createItem(item);
       await onItemCreated();
       onClose();
+      onMessage("◎商品を追加しました", "success");
     } catch (error) {
       if (error.message === "ITEM_NAME_ALREADY_EXISTS") {
-        setError("※同じ商品名がすでに登録されています※");
+        showMessage("※同じ商品名がすでに登録されています※", "error");
       } else if (error.message === "CATEGORY_NOT_FOUND") {
-        setError("※カテゴリが見つかりません。※");
+        showMessage("※カテゴリが見つかりません※", "error");
       } else if (error.message === "ITEM_REQUEST_INVALID") {
-        setError("※入力内容に誤りがあります。※");
+        showMessage("※入力内容に誤りがあります※", "error");
       } else {
-        setError("※商品を登録できませんでした。※");
+        showMessage("※商品を登録できませんでした※", "error");
       }
     }
   };
@@ -79,7 +83,11 @@ function AddItemModal({
           </button>
         </div>
 
-        {error && <p className="form-error">{error}</p>}
+        <div className="message-area">
+          {message.text && (
+            <p className={`message ${message.type}`}>{message.text}</p>
+          )}
+        </div>
 
         <label>
           商品名<span className="required"> *</span>
@@ -160,6 +168,7 @@ function AddItemModal({
         <AddCategoryModal
           onClose={() => setIsAddCategoryModalOpen(false)}
           onCategoryCreated={onCategoriesChanged}
+          onMessage={showMessage}
         />
       )}
     </div>

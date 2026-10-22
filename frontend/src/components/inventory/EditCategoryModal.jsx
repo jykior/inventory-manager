@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { updateCategory } from "../../api/itemApi";
 
-function EditCategoryModal({ category, onClose, onCategoryChanged }) {
+function EditCategoryModal({
+  category,
+  onClose,
+  onCategoryChanged,
+  onMessage,
+}) {
   const [name, setName] = useState(category.name);
   const [error, setError] = useState("");
   const [colorCode, setColorCode] = useState(category.colorCode);
@@ -14,6 +19,10 @@ function EditCategoryModal({ category, onClose, onCategoryChanged }) {
     "rgba(218, 133, 212,0.5)",
     "rgba(237, 127, 18,0.5)",
   ];
+  const errorMessage = (text) => {
+    setError(text);
+    setTimeout(() => setError(""), 5000);
+  };
   /**
    * カテゴリを更新する。
    *
@@ -22,15 +31,13 @@ function EditCategoryModal({ category, onClose, onCategoryChanged }) {
    */
   const handleSubmit = async () => {
     if (!name.trim()) {
-      setError("※カテゴリ名を入力してください※");
+      errorMessage("※カテゴリ名を入力してください※");
       return;
     }
-
     if (!colorCode) {
-      setError("※カテゴリカラーを選択してください※");
+      errorMessage("※カテゴリカラーを選択してください※");
       return;
     }
-
     try {
       await updateCategory(category.id, {
         name: name.trim(),
@@ -38,15 +45,16 @@ function EditCategoryModal({ category, onClose, onCategoryChanged }) {
       });
       await onCategoryChanged();
       onClose();
+      onMessage("◎カテゴリを変更しました", "success");
     } catch (error) {
       if (error.message === "CATEGORY_NAME_ALREADY_EXISTS") {
-        setError("※同じカテゴリ名がすでに登録されています※");
+        errorMessage("※同じカテゴリ名がすでに登録されています※");
       } else if (error.message === "CATEGORY_NOT_FOUND") {
-        setError("※カテゴリが見つかりません。※");
+        errorMessage("※カテゴリが見つかりません※");
       } else if (error.message === "CATEGORY_REQUEST_INVALID") {
-        setError("※入力内容に誤りがあります。※");
+        errorMessage("※入力内容に誤りがあります※");
       } else {
-        setError("※カテゴリを登録できませんでした。※");
+        errorMessage("※カテゴリを登録できませんでした※");
       }
     }
   };
@@ -60,9 +68,9 @@ function EditCategoryModal({ category, onClose, onCategoryChanged }) {
             ×
           </button>
         </div>
-
-        {error && <p className="form-error">{error}</p>}
-
+        <div className="message-area">
+          {error && <p className="error-message">{error}</p>}
+        </div>
         <label>
           カテゴリ名<span className="required"> *</span>
           <input

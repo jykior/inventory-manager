@@ -20,6 +20,12 @@ function Items({
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [message, setMessage] = useState({ text: "", type: "" });
+
+  const showMessage = (text, type) => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: "", type: "" }), 5000);
+  };
 
   const alertItems = allItems.filter(
     (item) => getStockStatus(item).status === "注意",
@@ -73,7 +79,11 @@ function Items({
         categories={categories}
         initialStatus={initialStatus}
       />
-
+      <div className="message-area">
+        {message.text && (
+          <p className={`message ${message.type}`}>{message.text}</p>
+        )}
+      </div>
       <table className="item-table">
         <thead>
           <tr>
@@ -96,6 +106,7 @@ function Items({
               onUpdateStock={onUpdateStock}
               onItemsChanged={onItemsChanged}
               user={user}
+              onMessage={showMessage}
             />
           ))}
         </tbody>
@@ -116,6 +127,7 @@ function Items({
           onClose={() => setIsAddItemModalOpen(false)}
           onItemCreated={onItemsChanged}
           onCategoriesChanged={onCategoriesChanged}
+          onMessage={showMessage}
         />
       )}
     </>

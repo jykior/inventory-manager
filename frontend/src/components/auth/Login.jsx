@@ -27,11 +27,11 @@ function Login({ onLogin }) {
     e.preventDefault();
 
     if (!email.trim()) {
-      showMessage("メールアドレスを入力してください", "error");
+      showMessage("※メールアドレスを入力してください※", "error");
       return;
     }
     if (!password.trim()) {
-      showMessage("パスワードを入力してください", "error");
+      showMessage("※パスワードを入力してください※", "error");
       return;
     }
     try {
@@ -40,13 +40,13 @@ function Login({ onLogin }) {
     } catch (error) {
       if (error.message === "LOGIN_FAILED") {
         showMessage(
-          "メールアドレスまたはパスワードが正しくありません",
+          "※メールアドレスまたはパスワードが正しくありません※",
           "error",
         );
       } else if (error.message === "LOGIN_REQUEST_INVALID") {
-        showMessage("入力内容を確認してください", "error");
+        showMessage("※入力内容を確認してください※", "error");
       } else {
-        showMessage("ログインに失敗しました", "error");
+        showMessage("※ログインに失敗しました※", "error");
       }
     }
   };
@@ -60,7 +60,7 @@ function Login({ onLogin }) {
       const user = await guestLogin();
       onLogin(user);
     } catch (error) {
-      showMessage("ゲストログインに失敗しました", "error");
+      showMessage("※ゲストログインに失敗しました※", "error");
     }
   };
 
@@ -111,11 +111,11 @@ function Login({ onLogin }) {
               />
             </div>
           </div>
-
-          {message.text && (
-            <p className={`login-message ${message.type}`}>{message.text}</p>
-          )}
-
+          <div className="message-area">
+            {message.text && (
+              <p className={`login-message ${message.type}`}>{message.text}</p>
+            )}
+          </div>
           <button type="submit" className="login-button">
             ログイン
           </button>
@@ -155,9 +155,7 @@ function Login({ onLogin }) {
       {showUserRegister && (
         <UserRegisterModal
           onClose={() => setShowUserRegister(false)}
-          onRegisterSuccess={() => {
-            showMessage("ユーザー登録が完了しました。", "success");
-          }}
+          onRegisterSuccess={showMessage}
         />
       )}
     </div>

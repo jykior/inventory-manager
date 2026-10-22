@@ -27,7 +27,6 @@
   align-items: center;
   width: 100%;
   gap: 16px;
-  margin-bottom: 20px;
   margin-left: 20px;
 }
 
@@ -311,7 +310,6 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
 }
 
 .category-header h2 {
@@ -328,6 +326,7 @@
 .category-table-wrapper {
   max-height: 50vh;
   overflow-y: auto;
+  margin-top: 10px;
 }
 
 .category-table {
@@ -414,7 +413,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
 }
 
 .item-modal-header h2 {
@@ -437,7 +435,7 @@
 
 .item-modal label {
   display: block;
-  margin-bottom: 14px;
+  margin: 7px 0;
   font-size: 14px;
   font-weight: bold;
 }
@@ -492,11 +490,6 @@
   opacity: 0.85;
 }
 
-.form-error {
-  color: #d93636;
-  font-size: 16px;
-  margin: 4px 0 8px;
-}
 .category-add {
   display: flex;
   justify-content: space-between;
@@ -526,7 +519,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 8px;
 }
 
 .category-form-modal-header h2 {
@@ -719,4 +712,7 @@
 .stock-in-confirm-button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+.message-area {
+  height: 20px;
 }

@@ -16,34 +16,34 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
    */
   const handleRegister = async () => {
     if (!nickname || !email || !password || !confirmPassword) {
-      setMessage("未入力の項目があります");
+      setMessage("※未入力の項目があります※");
       return;
     }
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailPattern.test(email)) {
-      setMessage("正しいメールアドレスを入力してください");
+      setMessage("※正しいメールアドレスを入力してください※");
       return;
     }
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#]{6,}$/;
     if (!passwordPattern.test(password)) {
-      setMessage("パスワードは6文字以上の英数字で入力してください");
+      setMessage("※パスワードは6文字以上の英数字で入力してください※");
       return;
     }
     if (password !== confirmPassword) {
-      setMessage("パスワードが一致しません");
+      setMessage("※パスワードが一致しません※");
       return;
     }
     try {
       await userRegister(email, password, confirmPassword, nickname);
-      onRegisterSuccess();
       onClose();
+      onRegisterSuccess("◎ユーザー登録が完了しました。", "success");
     } catch (error) {
       if (error.message === "PASSWORD_MISMATCH") {
-        setMessage("パスワードが一致しません");
+        setMessage("※パスワードが一致しません※");
       } else if (error.message === "EMAIL_ALREADY_EXISTS") {
-        setMessage("このメールアドレスはすでに登録されています");
+        setMessage("※このメールアドレスはすでに登録されています※");
       } else {
-        setMessage("ユーザー登録に失敗しました");
+        setMessage("※ユーザー登録に失敗しました※");
       }
     }
   };

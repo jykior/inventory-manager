@@ -8,7 +8,7 @@ function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
   const [selectedCategory, setSelectedCategory] = useState("すべて");
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [sortOrder, setSortOrder] = useState("default");
+  const [sortType, setSortType] = useState("default");
 
   useEffect(() => {
     let filterItems = [...allItems];
@@ -30,7 +30,19 @@ function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
     }
 
     // 並び替え
-    if (sortOrder === "default") {
+    if (sortType === "default") {
+      filterItems.sort((a, b) => {
+        const orderA = a.sortOrder ?? Number.MAX_SAFE_INTEGER;
+        const orderB = b.sortOrder ?? Number.MAX_SAFE_INTEGER;
+
+        if (orderA !== orderB) {
+          return orderA - orderB;
+        }
+        // 番号が同じ場合は商品ID順
+        return a.id - b.id;
+      });
+    }
+    if (sortType === "order") {
       filterItems.sort((a, b) => {
         //  カテゴリID順
         const categoryIdA = a.category?.id ?? Number.MAX_SAFE_INTEGER;
@@ -39,7 +51,6 @@ function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
         if (categoryIdA !== categoryIdB) {
           return categoryIdA - categoryIdB;
         }
-
         // 同じカテゴリ内では商品sortOrder順
         const itemSortOrderA = a.sortOrder ?? Number.MAX_SAFE_INTEGER;
         const itemSortOrderB = b.sortOrder ?? Number.MAX_SAFE_INTEGER;
@@ -47,18 +58,22 @@ function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
         if (itemSortOrderA !== itemSortOrderB) {
           return itemSortOrderA - itemSortOrderB;
         }
-        // sortOrderが同じ場合は商品ID順
+        // 番号が同じ場合は商品ID順
         return a.id - b.id;
       });
     }
-
-    if (sortOrder === "desc") {
+    if (sortType === "desc") {
       filterItems.sort((a, b) => b.currentStock - a.currentStock);
     }
-    if (sortOrder === "asc") {
+    if (sortType === "asc") {
       filterItems.sort((a, b) => a.currentStock - b.currentStock);
     }
-
+    if (sortType === "name") {
+      filterItems.sort((a, b) => a.name.localeCompare(b.name, "ja"));
+    }
+    if (sortType === "nameDesc") {
+      filterItems.sort((a, b) => b.name.localeCompare(a.name, "ja"));
+    }
     // 商品名検索
     if (searchKeyword.trim() !== "") {
       filterItems = filterItems.filter((item) =>
@@ -70,7 +85,7 @@ function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
     allItems,
     selectedCategory,
     selectedStatus,
-    sortOrder,
+    sortType,
     searchKeyword,
     setDisplayItems,
   ]);
@@ -84,7 +99,7 @@ function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
   };
 
   const handleSortChange = (e) => {
-    setSortOrder(e.target.value);
+    setSortType(e.target.value);
   };
 
   const handleSearchChange = (e) => {
@@ -110,10 +125,13 @@ function ItemFilter({ allItems, setDisplayItems, categories, initialStatus }) {
         <option value="注意">注意</option>
       </select>
 
-      <select value={sortOrder} onChange={handleSortChange}>
-        <option value="default">カテゴリ順</option>
+      <select value={sortType} onChange={handleSortChange}>
+        <option value="default">並び順（全カテゴリ）</option>
+        <option value="order">並び順（カテゴリ別）</option>
         <option value="desc">在庫が多い順</option>
         <option value="asc">在庫が少ない順</option>
+        <option value="name">名前順（昇順）</option>
+        <option value="nameDesc">名前順（降順）</option>
       </select>
 
       <div className="search-box">

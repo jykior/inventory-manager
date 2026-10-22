@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { updateItem } from "../../api/itemApi";
 
-function EditItemModal({ item, categories, onClose, onItemChanged }) {
+function EditItemModal({
+  item,
+  categories,
+  onClose,
+  onItemChanged,
+  onMessage,
+}) {
   const [name, setName] = useState(item.name);
   const [category, setCategory] = useState(String(item.category.id));
   const [currentStock, setCurrentStock] = useState(item.currentStock);
@@ -10,6 +16,10 @@ function EditItemModal({ item, categories, onClose, onItemChanged }) {
   const [sortOrder, setSortOrder] = useState(item.sortOrder ?? "");
   const [error, setError] = useState("");
 
+  const errorMessage = (text) => {
+    setError(text);
+    setTimeout(() => setError(""), 5000);
+  };
   /**
    * 商品情報を更新する。
    *
@@ -17,22 +27,20 @@ function EditItemModal({ item, categories, onClose, onItemChanged }) {
    * 商品を更新した後に商品一覧を更新する。
    */
   const handleSubmit = async () => {
-    setError("");
-
     if (!name.trim()) {
-      setError("※商品名を入力してください※");
+      errorMessage("※商品名を入力してください※");
       return;
     }
     if (!category) {
-      setError("※カテゴリを選択してください※");
+      errorMessage("※カテゴリを選択してください※");
       return;
     }
     if (currentStock === "") {
-      setError("※現在の在庫数を入力してください※");
+      errorMessage("※現在の在庫数を入力してください※");
       return;
     }
     if (alertEnabled && minStock === "") {
-      setError("※アラート数を入力してください※");
+      errorMessage("※アラート数を入力してください※");
       return;
     }
     try {
@@ -49,15 +57,16 @@ function EditItemModal({ item, categories, onClose, onItemChanged }) {
       await updateItem(updateItemData);
       await onItemChanged();
       onClose();
+      onMessage("◎商品を変更しました", "success");
     } catch (error) {
       if (error.message === "ITEM_NAME_ALREADY_EXISTS") {
-        setError("※同じ商品名がすでに登録されています※");
+        errorMessage("※同じ商品名がすでに登録されています※");
       } else if (error.message === "ITEM_OR_CATEGORY_NOT_FOUND") {
-        setError("※商品またはカテゴリが見つかりません。※");
+        errorMessage("※商品またはカテゴリが見つかりません※");
       } else if (error.message === "ITEM_REQUEST_INVALID") {
-        setError("※入力内容に誤りがあります。※");
+        errorMessage("※入力内容に誤りがあります※");
       } else {
-        setError("※商品を登録できませんでした。※");
+        errorMessage("※商品を登録できませんでした※");
       }
     }
   };
@@ -73,7 +82,9 @@ function EditItemModal({ item, categories, onClose, onItemChanged }) {
           </button>
         </div>
 
-        {error && <p className="form-error">{error}</p>}
+        <div className="message-area">
+          {error && <p className="error-message">{error}</p>}
+        </div>
 
         <label>
           商品名<span className="required"> *</span>

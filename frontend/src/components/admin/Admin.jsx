@@ -27,14 +27,14 @@ function Admin() {
       setUsers((users) =>
         users.map((user) => (user.id === id ? { ...user, role: role } : user)),
       );
-      showMessage("権限を変更しました", "success");
+      showMessage("◎権限を変更しました", "success");
     } catch (error) {
       if (error.message === "ADMIN_ALREADY_EXISTS") {
-        showMessage("管理者はすでに存在しています", "error");
+        showMessage("※管理者はすでに存在しています※", "error");
       } else if (error.message === "USER_NOT_FOUND") {
-        showMessage("対象のユーザーが見つかりません", "error");
+        showMessage("※対象のユーザーが見つかりません※", "error");
       } else {
-        showMessage("権限の変更に失敗しました", "error");
+        showMessage("※権限の変更に失敗しました※", "error");
       }
     }
   };
