@@ -23,6 +23,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -196,5 +197,10 @@ public class UsersController {
       }
       throw e;
     }
+  }
+
+  @GetMapping("/csrf")
+  public CsrfToken csrf(CsrfToken csrfToken) {
+    return csrfToken;
   }
 }

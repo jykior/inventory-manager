@@ -1,12 +1,11 @@
+import { clearCsrf, csrfFetch } from "./csrfApi";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const login = async (email, password) => {
-  const response = await fetch(`${API_URL}/api/auth/login`, {
+  const response = await csrfFetch(`${API_URL}/api/auth/login`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
   if (!response.ok) {
@@ -22,19 +21,18 @@ export const login = async (email, password) => {
 };
 
 export const logout = async () => {
-  const response = await fetch(`${API_URL}/api/auth/logout`, {
+  const response = await csrfFetch(`${API_URL}/api/auth/logout`, {
     method: "POST",
-    credentials: "include",
   });
+  clearCsrf();
   if (!response.ok) {
     throw new Error("LOGOUT_FAILED");
   }
 };
 
 export const guestLogin = async () => {
-  const response = await fetch(`${API_URL}/api/guest/login`, {
+  const response = await csrfFetch(`${API_URL}/api/guest/login`, {
     method: "POST",
-    credentials: "include",
   });
   if (!response.ok) {
     throw new Error("GUEST_LOGIN_FAILED");
@@ -43,10 +41,10 @@ export const guestLogin = async () => {
 };
 
 export const guestLogout = async () => {
-  const response = await fetch(`${API_URL}/api/guest/logout`, {
+  const response = await csrfFetch(`${API_URL}/api/guest/logout`, {
     method: "POST",
-    credentials: "include",
   });
+  clearCsrf();
   if (!response.ok) {
     throw new Error("GUEST_LOGOUT_FAILED");
   }
@@ -58,10 +56,9 @@ export const userRegister = async (
   confirmPassword,
   nickname,
 ) => {
-  const response = await fetch(`${API_URL}/api/auth/register`, {
+  const response = await csrfFetch(`${API_URL}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: "include",
     body: JSON.stringify({ email, password, confirmPassword, nickname }),
   });
   if (!response.ok) {
@@ -86,12 +83,9 @@ export const getUsers = async () => {
 };
 
 export const updateUserRole = async (id, role) => {
-  const response = await fetch(`${API_URL}/api/auth/${id}/role`, {
+  const response = await csrfFetch(`${API_URL}/api/auth/${id}/role`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ role }),
   });
   if (!response.ok) {
@@ -106,12 +100,9 @@ export const updateUserRole = async (id, role) => {
 };
 
 export const updateEmail = async (email) => {
-  const response = await fetch(`${API_URL}/api/auth/email`, {
+  const response = await csrfFetch(`${API_URL}/api/auth/email`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   });
   if (!response.ok) {
@@ -127,12 +118,9 @@ export const updateEmail = async (email) => {
 };
 
 export const updatePassword = async (password) => {
-  const response = await fetch(`${API_URL}/api/auth/password`, {
+  const response = await csrfFetch(`${API_URL}/api/auth/password`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ password }),
   });
   if (!response.ok) {
@@ -147,12 +135,9 @@ export const updatePassword = async (password) => {
 };
 
 export const updateNickname = async (nickname) => {
-  const response = await fetch(`${API_URL}/api/auth/nickname`, {
+  const response = await csrfFetch(`${API_URL}/api/auth/nickname`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ nickname }),
   });
   if (!response.ok) {
@@ -165,10 +150,10 @@ export const updateNickname = async (nickname) => {
 };
 
 export const deleteAccount = async () => {
-  const response = await fetch(`${API_URL}/api/auth`, {
+  const response = await csrfFetch(`${API_URL}/api/auth`, {
     method: "DELETE",
-    credentials: "include",
   });
+  clearCsrf();
   if (!response.ok) {
     throw new Error("ACCOUNT_DELETE_FAILED");
   }

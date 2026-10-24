@@ -91,6 +91,9 @@
   margin-right: 14px;
   color: #e5ad55;
   font-size: 23px;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .login-input input {
@@ -222,7 +225,8 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-.register-modal button {
+.register-modal .register-submit-button,
+.register-modal .register-close-button {
   height: 48px;
   padding: 0 50px;
   margin: 10px 25px 0;
@@ -231,13 +235,13 @@
   cursor: pointer;
 }
 
-.register-modal button:first-of-type {
+.register-modal .register-submit-button {
   background: #e0aa4f;
   border: 1px solid #e0aa4f;
   color: #111;
 }
 
-.register-modal button:last-of-type {
+.register-modal .register-close-button {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.5);
   color: white;

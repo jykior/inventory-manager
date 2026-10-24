@@ -54,8 +54,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
     http.cors(cors -> {
-        }).csrf(csrf -> csrf.disable())
-        .securityContext(context ->
+        }).securityContext(context ->
             context.securityContextRepository(securityContextRepository()))
         .exceptionHandling(ex -> ex
             .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
@@ -67,7 +66,8 @@ public class SecurityConfig {
                 "/api/auth/register",
                 "/api/guest/login",
                 "/error",
-                "/health"
+                "/health",
+                "/api/auth/csrf"
             ).permitAll()
             .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
             // 商品・カテゴリ操作

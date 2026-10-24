@@ -1,3 +1,5 @@
+import { csrfFetch } from "./csrfApi";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const getItems = async () => {
@@ -21,12 +23,9 @@ export const getCategories = async () => {
 };
 
 export const createItem = async (item) => {
-  const response = await fetch(`${API_URL}/api/items`, {
+  const response = await csrfFetch(`${API_URL}/api/items`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(item),
   });
   if (!response.ok) {
@@ -44,12 +43,9 @@ export const createItem = async (item) => {
 };
 
 export const createCategory = async (category) => {
-  const response = await fetch(`${API_URL}/api/categories`, {
+  const response = await csrfFetch(`${API_URL}/api/categories`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(category),
   });
   if (!response.ok) {
@@ -65,12 +61,9 @@ export const createCategory = async (category) => {
 };
 
 export const updateItem = async (item) => {
-  const response = await fetch(`${API_URL}/api/items/${item.id}`, {
+  const response = await csrfFetch(`${API_URL}/api/items/${item.id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(item),
   });
   if (!response.ok) {
@@ -88,12 +81,9 @@ export const updateItem = async (item) => {
 };
 
 export const updateCategory = async (id, category) => {
-  const response = await fetch(`${API_URL}/api/categories/${id}`, {
+  const response = await csrfFetch(`${API_URL}/api/categories/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(category),
   });
   if (!response.ok) {
@@ -111,12 +101,9 @@ export const updateCategory = async (id, category) => {
 };
 
 export const updateStock = async (item, newStock) => {
-  const response = await fetch(`${API_URL}/api/items/${item.id}/stock`, {
+  const response = await csrfFetch(`${API_URL}/api/items/${item.id}/stock`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       currentStock: newStock,
     }),
@@ -134,9 +121,8 @@ export const updateStock = async (item, newStock) => {
 };
 
 export const deleteItem = async (id) => {
-  const response = await fetch(`${API_URL}/api/items/${id}`, {
+  const response = await csrfFetch(`${API_URL}/api/items/${id}`, {
     method: "DELETE",
-    credentials: "include",
   });
   if (!response.ok) {
     if (response.status === 404) {
@@ -147,9 +133,8 @@ export const deleteItem = async (id) => {
 };
 
 export const deleteCategory = async (id) => {
-  const response = await fetch(`${API_URL}/api/categories/${id}`, {
+  const response = await csrfFetch(`${API_URL}/api/categories/${id}`, {
     method: "DELETE",
-    credentials: "include",
   });
   if (!response.ok) {
     if (response.status === 409) {

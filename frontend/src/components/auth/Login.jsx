@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { login, guestLogin } from "../../api/authApi";
-import { DoorOpen, KeyRound, Mail, UserPlus } from "lucide-react";
+import { DoorOpen, Mail, UserPlus, Eye, EyeOff } from "lucide-react";
 import UserRegisterModal from "./UserRegisterModal";
 import "./Auth.css";
 
@@ -9,6 +9,7 @@ function Login({ onLogin }) {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
   const [showUserRegister, setShowUserRegister] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const showMessage = (text, type) => {
     setMessage({ text: text, type: type });
@@ -100,11 +101,18 @@ function Login({ onLogin }) {
               <span className="login-text">パスワード</span>
             </label>
             <div className="login-input">
-              <span className="login-icon">
-                <KeyRound size={24} />
-              </span>
+              <button
+                className="login-icon"
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={
+                  showPassword ? "パスワードを表示" : "パスワードを隠す"
+                }
+              >
+                {showPassword ? <Eye size={24} /> : <EyeOff size={24} />}
+              </button>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="パスワード"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

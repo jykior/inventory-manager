@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { userRegister } from "../../api/authApi";
-import { Mail, KeyRound, User, BadgeCheck } from "lucide-react";
+import { Mail, User, Eye, EyeOff } from "lucide-react";
 
 const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
   const [email, setEmail] = useState("");
@@ -8,6 +8,7 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
   const [nickname, setNickname] = useState("");
   const [message, setMessage] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   /**
    * ユーザー登録を行う。
    *
@@ -74,11 +75,18 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
             <span className="required"> *</span>
           </label>
           <div className="login-input">
-            <span className="login-icon">
-              <KeyRound size={24} />
-            </span>
+            <button
+              className="login-icon"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={
+                showPassword ? "パスワードを表示" : "パスワードを隠す"
+              }
+            >
+              {showPassword ? <Eye size={24} /> : <EyeOff size={24} />}
+            </button>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="6文字以上の英数字で入力"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -88,7 +96,7 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
         <div className="password-note">
           <div>
             ※
-            英字（大文字・小文字どちらでも）・数字を必ず含む、英数字・記号の6文字以上で入力してください。
+            英字（大文字or小文字）・数字を必ず含む、英数字・記号の6文字以上で入力
           </div>
           <div>使用できる記号：! @ #</div>
         </div>
@@ -98,11 +106,18 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
             <span className="required"> *</span>
           </label>
           <div className="login-input">
-            <span className="login-icon">
-              <BadgeCheck size={24} />
-            </span>
+            <button
+              className="login-icon"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={
+                showPassword ? "パスワードを表示" : "パスワードを隠す"
+              }
+            >
+              {showPassword ? <Eye size={24} /> : <EyeOff size={24} />}
+            </button>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="もう一度パスワードを入力"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -129,8 +144,12 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
 
         {message && <p className="user-register-error">{message}</p>}
 
-        <button onClick={handleRegister}>登録</button>
-        <button onClick={onClose}>閉じる</button>
+        <button className="register-submit-button" onClick={handleRegister}>
+          登録
+        </button>
+        <button className="register-close-button" onClick={onClose}>
+          閉じる
+        </button>
       </div>
     </div>
   );

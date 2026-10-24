@@ -41,10 +41,6 @@ function AddItemModal({
       showMessage("※現在の在庫数を入力してください※", "error");
       return;
     }
-    if (alertEnabled && minStock === "") {
-      showMessage("※アラート数を入力してください※", "error");
-      return;
-    }
     try {
       const item = {
         name: name.trim(),
