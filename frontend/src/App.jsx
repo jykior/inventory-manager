@@ -17,6 +17,7 @@ function App() {
   const [initialStatus, setInitialStatus] = useState("すべて");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   const fetchItems = async () => {
     const data = await getItems();
@@ -30,7 +31,6 @@ function App() {
 
   useEffect(() => {
     const savedUser = sessionStorage.getItem("user");
-
     if (savedUser) {
       const user = JSON.parse(savedUser);
       setUser(user);
@@ -39,6 +39,24 @@ function App() {
       fetchItems();
       fetchCategories();
     }
+  }, []);
+    /**
+   * セッション切れが発生した際にログイン状態を解除し、ログイン画面へ戻す。
+   */
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      sessionStorage.removeItem("user");
+      setUser(null);
+      setIsLoggedIn(false);
+      setCurrentPage("home");
+      setSessionExpired(true);
+    };
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+
+    return () => {
+      window.removeEventListener("auth:unauthorized", handleUnauthorized);
+    };
   }, []);
   /**
    * ログイン成功時の処理を行う。
@@ -56,7 +74,7 @@ function App() {
   };
 
   if (!isLoggedIn) {
-    return <Login onLogin={handleLogin} />;
+    return <Login onLogin={handleLogin} sessionExpired={sessionExpired} />;
   }
   /**
    * ログアウト処理を行う。

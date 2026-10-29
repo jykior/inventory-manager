@@ -4,10 +4,15 @@ import { DoorOpen, Mail, UserPlus, Eye, EyeOff } from "lucide-react";
 import UserRegisterModal from "./UserRegisterModal";
 import "./Auth.css";
 
-function Login({ onLogin }) {
+function Login({ onLogin, sessionExpired }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState({ text: "", type: "" });
+  const [message, setMessage] = useState({
+    text: sessionExpired
+      ? "セッションが切れました。再ログインしてください"
+      : "",
+    type: sessionExpired ? "error" : "",
+  });
   const [showUserRegister, setShowUserRegister] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 

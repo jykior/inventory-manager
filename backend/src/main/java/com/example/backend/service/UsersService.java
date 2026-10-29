@@ -95,12 +95,15 @@ public class UsersService {
   }
 
   public void updateRole(Long id, String role) {
+    Users users = usersRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("USER_NOT_FOUND"));
+
+    if ("ADMIN".equals(users.getRole())) {
+      throw new IllegalArgumentException("ADMIN_CANNOT_CHANGE");
+    }
     if ("ADMIN".equals(role) && usersRepository.existsByRole("ADMIN")) {
       throw new IllegalArgumentException("ADMIN_ALREADY_EXISTS");
     }
-
-    Users users = usersRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("USER_NOT_FOUND"));
 
     users.setRole(role);
 

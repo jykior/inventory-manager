@@ -163,7 +163,6 @@ public class UsersController {
         authentication.getName(),
         nicknameUpdateRequest.getNickname()
     );
-
     return UserResponse.from(users);
   }
 
@@ -189,7 +188,7 @@ public class UsersController {
     try {
       usersService.updateRole(id, roleRequest.getRole());
     } catch (IllegalArgumentException e) {
-      if ("ADMIN_ALREADY_EXISTS".equals(e.getMessage())) {
+      if ("ADMIN_ALREADY_EXISTS".equals(e.getMessage()) || "ADMIN_CANNOT_CHANGE".equals(e.getMessage())) {
         throw new ResponseStatusException(HttpStatus.CONFLICT);
       }
       if ("USER_NOT_FOUND".equals(e.getMessage())) {

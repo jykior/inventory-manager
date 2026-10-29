@@ -29,8 +29,8 @@ function Admin() {
       );
       showMessage("◎権限を変更しました", "success");
     } catch (error) {
-      if (error.message === "ADMIN_ALREADY_EXISTS") {
-        showMessage("※管理者はすでに存在しています※", "error");
+      if (error.message === "ADMIN_CONFLICT") {
+        showMessage("※管理者の権限は変更できません※", "error");
       } else if (error.message === "USER_NOT_FOUND") {
         showMessage("※対象のユーザーが見つかりません※", "error");
       } else {

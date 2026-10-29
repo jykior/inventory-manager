@@ -16,9 +16,26 @@ export const clearCsrf = () => {
   csrf = null;
 };
 
+export const apiFetch = async (url, options = {}) => {
+  const response = await fetch(url, {
+    ...options,
+    credentials: "include",
+  });
+
+  const isLoginRequest =
+    url.endsWith("/api/auth/login") ||
+    url.endsWith("/api/guest/login");
+
+  if (response.status === 401 && !isLoginRequest) {
+    window.dispatchEvent(new Event("auth:unauthorized"));
+  }
+
+  return response;
+};
+
 export const csrfFetch = async (url, options = {}) => {
   const send = async () =>
-    fetch(url, {
+    apiFetch(url, {
       ...options,
       headers: { ...options.headers, ...(await getCsrfHeaders()) },
       credentials: "include",

@@ -90,7 +90,7 @@ export const updateUserRole = async (id, role) => {
   });
   if (!response.ok) {
     if (response.status === 409) {
-      throw new Error("ADMIN_ALREADY_EXISTS");
+      throw new Error("ADMIN_CONFLICT");
     } else if (response.status === 404) {
       throw new Error("USER_NOT_FOUND");
     } else {

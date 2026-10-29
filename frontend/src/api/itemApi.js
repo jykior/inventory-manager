@@ -1,11 +1,9 @@
-import { csrfFetch } from "./csrfApi";
+import { apiFetch, csrfFetch } from "./csrfApi";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const getItems = async () => {
-  const response = await fetch(`${API_URL}/api/items`, {
-    credentials: "include",
-  });
+  const response = await apiFetch(`${API_URL}/api/items`);
   if (!response.ok) {
     throw new Error("ITEMS_FETCH_FAILED");
   }
@@ -13,9 +11,7 @@ export const getItems = async () => {
 };
 
 export const getCategories = async () => {
-  const response = await fetch(`${API_URL}/api/categories`, {
-    credentials: "include",
-  });
+  const response = await apiFetch(`${API_URL}/api/categories`);
   if (!response.ok) {
     throw new Error("CATEGORIES_FETCH_FAILED");
   }
