@@ -63,7 +63,8 @@ function ItemCard({
         style={{
           backgroundColor: status.alertBackgroundColor,
         }}
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           onSelectItem(item.id);
           setStockChange(0);
         }}
@@ -93,7 +94,7 @@ function ItemCard({
           <div className="item-stock">
             {isSelected && (
               <button
-                className="stock-control"
+                className="stock-control stock-minus"
                 onClick={(e) => {
                   e.stopPropagation();
                   setStockChange((prev) =>
@@ -116,7 +117,7 @@ function ItemCard({
             </span>
             {isSelected && user?.role !== "STAFF" && (
               <button
-                className="stock-control"
+                className="stock-control  stock-plus"
                 onClick={(e) => {
                   e.stopPropagation();
                   setStockChange((prev) => prev + 1);
@@ -137,7 +138,7 @@ function ItemCard({
                   onSelectItem(null);
                 }}
               >
-                ✓
+                決定
               </button>
             )}
           </div>

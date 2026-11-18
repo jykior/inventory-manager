@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getStockStatus } from "../../utils/stockStatus";
 import { Package, OctagonAlert } from "lucide-react";
 import ItemCard from "./ItemCard";
@@ -30,6 +30,18 @@ function Items({
   const alertItems = allItems.filter(
     (item) => getStockStatus(item).status === "注意",
   );
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest("tr.item")) {
+        setSelectedItemId(null);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
