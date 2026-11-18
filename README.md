@@ -1,5 +1,5 @@
 # INVENTORYMANAGER
-<img src="images/inventory-manager.gif" width="300">
+<img src="images/inventory-manager.gif" width="600">
 
 ## アプリURL
 [INVENTORY MANAGER](https://inventory-manager-app.com)
