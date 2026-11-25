@@ -137,13 +137,25 @@ Spring Securityを利用した認証・認可の仕組みを理解したいと�
 ## 画面遷移図
 
 アプリ全体の画面遷移と、各画面から開くモーダルをまとめています。
+<details>
+<summary>画面遷移図を表示</summary>
+
 ![画面遷移図](images/画面遷移図.png)
+
+</details>
 
 ## インフラ構成図
 
+<details>
+<summary>インフラ構成図を表示</summary>
+
 ![インフラ構成図](docs/infrastructure.svg)
 
+</details>
+
 ## DB設計
+<details>
+<summary>DB設計を表示</summary>
 
 ### users
 
@@ -180,7 +192,11 @@ Spring Securityを利用した認証・認可の仕組みを理解したいと�
 | is_demo       | デモデータかどうか  |
 | guest_id      | ゲストユーザーID  |
 
+</details>
+
 ## ER図
+<details>
+<summary>ER図を表示</summary>
 
 ```mermaid
 erDiagram
@@ -219,6 +235,8 @@ erDiagram
 ###### 単一店舗での利用を想定しているため、通常の商品・カテゴリは店舗内で共有して管理します。
 ###### 一方、Web上でのデモ利用では複数ユーザーが同時に利用する可能性を考慮し、is_demo と guest_id によってゲストごとのデモデータを識別・分離しています。
 
+</details>
+
 ### 認証方式
 
 Spring Securityによるセッション認証を使用しています。
@@ -227,6 +245,8 @@ Spring Securityによるセッション認証を使用しています。
 パスワードはBCryptでハッシュ化して保存しています。
 
 ## APIのURL設計
+<details>
+<summary>API一覧を表示</summary>
 
 ### 商品API
 
@@ -267,6 +287,8 @@ Spring Securityによるセッション認証を使用しています。
 |----------|---------------------|----------|
 | POST     | `/api/guest/login`  | ゲストログイン  |
 | POST     | `/api/guest/logout` | ゲストログアウト |
+
+</details>
 
 ## 機能紹介
 
@@ -468,7 +490,7 @@ public class GuestCleanupScheduler {
 | <img src="images/在庫数変更.gif" width="100%" alt="在庫数変更フロー"> |
 
 - 入荷時は、「入庫」ボタンから入庫数を入力して、在庫を加算できます。
-- 商品を選び、「−」「＋」で増減量を調整して、「決定」で確定します。誤操作を防ぐため、変更内容を確認してから確定する仕組みにしています。[[詳細]](#誤操作を防ぐ在庫変更)
+- 商品を選び、「−」「＋」で増減量を調整して、「決定」で確定します。誤操作を防ぐため、変更内容を確認してから確定する仕組みにしています。[詳細](#誤操作を防ぐ在庫変更)
 - STAFF権限のユーザーは、在庫を減らす操作だけができます。
 
 <details>
