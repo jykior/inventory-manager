@@ -745,4 +745,4 @@ Spring Securityでは、Controllerで発生したエラーだけでなく、エ�
 
 メール通知機能を実装予定です。
 
-![通知設定](images/実装予定.png)
+<img src="images/実装予定.png" width="60%" alt="通知設定">
