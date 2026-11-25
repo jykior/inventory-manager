@@ -12,6 +12,6 @@ import lombok.Setter;
 public class PasswordUpdateRequest {
 
   @NotBlank
-  @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#]{6,}$")
+  @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#]{6,32}$")
   private String password;
 }

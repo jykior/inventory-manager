@@ -61,9 +61,12 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
       showMessage("※未入力の項目があります※", "error");
       return;
     }
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#]{6,}$/;
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#]{6,32}$/;
     if (!passwordPattern.test(password)) {
-      showMessage("※パスワードは6文字以上の英数字で入力してください※", "error");
+      showMessage(
+        "※パスワードは6~32字の半角英数字･記号で入力してください※",
+        "error",
+      );
       return;
     }
     if (password !== confirmPassword) {
@@ -93,7 +96,10 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
       showMessage("※ニックネームを入力してください※", "error");
       return;
     }
-
+    if (nickname.trim().length > 20) {
+      showMessage("※ニックネームは20字以内で入力してください※","error");
+      return;
+    }
     try {
       const updatedUser = await updateNickname(nickname.trim());
       onUserUpdated(updatedUser);
@@ -103,7 +109,7 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
       showMessage("◎ニックネームを変更しました", "success");
     } catch (error) {
       if (error.message === "NICKNAME_REQUEST_INVALID") {
-        showMessage("※ニックネームを入力してください※", "error");
+        showMessage("※ニックネームは20字以内で入力してください※", "error");
       } else {
         showMessage("※ニックネームの変更に失敗しました※", "error");
       }
@@ -120,8 +126,8 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
       onAccountDeleted();
     } catch {
       showMessage("退会に失敗しました", "error");
-      setIsDeleteAccountModalOpen(false);
     }
+    setIsDeleteAccountModalOpen(false);
   };
 
   return (
@@ -175,16 +181,16 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
               編集
             </button>
           </div>
-
-          <div className="setting-item account-delete">
-            <button
-              className="delete-account-button"
-              onClick={() => setIsDeleteAccountModalOpen(true)}
-            >
-              退会する
-            </button>
-          </div>
-
+          {user?.role !== "ADMIN" && (
+            <div className="setting-item account-delete">
+              <button
+                className="delete-account-button"
+                onClick={() => setIsDeleteAccountModalOpen(true)}
+              >
+                退会する
+              </button>
+            </div>
+          )}
           {isEmailModalOpen && (
             <div className="modal-overlay">
               <div className="account-modal">
@@ -230,13 +236,16 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
 
                 <input
                   type="password"
-                  placeholder="6文字以上の英数字で入力"
+                  placeholder="6~32字の半角英数字･記号で入力"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
 
                 <div className="password-note">
-                  <div>※ 英字・数字を必ず含む6文字以上で入力してください。</div>
+                  <div>
+                    ※
+                    英字（大文字or小文字）・数字を必ず含む、6~32字の半角英数字・記号で入力
+                  </div>
                   <div>使用できる記号：! @ #</div>
                 </div>
 
@@ -281,7 +290,7 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
               <div className="account-modal">
                 <h3>ニックネーム変更</h3>
 
-                <p>新しいニックネーム</p>
+                <p>新しいニックネーム(20字以内)</p>
 
                 <input
                   type="text"
@@ -323,7 +332,7 @@ function Setting({ user, onUserUpdated, onAccountDeleted }) {
                 {message.type === "error" && (
                   <p className="error-message">{message.text}</p>
                 )}
-                
+
                 <div className="delete-modal-buttons">
                   <button
                     onClick={() => {

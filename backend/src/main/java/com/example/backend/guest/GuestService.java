@@ -168,7 +168,7 @@ public class GuestService {
 
   @Transactional
   public void cleanupExpiredGuest() {
-    LocalDateTime threshold = LocalDateTime.now().minusMinutes(30);
+    LocalDateTime threshold = LocalDateTime.now().minusMinutes(60);
 
     List<Users> expiredGuest =
         usersRepository.findByRoleAndLastAccessedAtBefore("GUEST", threshold);

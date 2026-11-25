@@ -66,6 +66,8 @@ export const userRegister = async (
       throw new Error("PASSWORD_MISMATCH");
     } else if (response.status === 409) {
       throw new Error("EMAIL_ALREADY_EXISTS");
+    } else if (response.status === 400) {
+      throw new Error("REGISTER_REQUEST_INVALID");
     } else {
       throw new Error("REGISTER_FAILED");
     }

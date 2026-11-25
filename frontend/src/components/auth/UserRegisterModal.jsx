@@ -25,13 +25,17 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
       setMessage("※正しいメールアドレスを入力してください※");
       return;
     }
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#]{6,}$/;
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#]{6,32}$/;
     if (!passwordPattern.test(password)) {
-      setMessage("※パスワードは6文字以上の英数字で入力してください※");
+      setMessage("※パスワードは6~32字の英数字･記号で入力してください※");
       return;
     }
     if (password !== confirmPassword) {
       setMessage("※パスワードが一致しません※");
+      return;
+    }
+    if (nickname.length > 20) {
+      setMessage("※ニックネームは20字以内で入力してください※");
       return;
     }
     try {
@@ -43,6 +47,8 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
         setMessage("※パスワードが一致しません※");
       } else if (error.message === "EMAIL_ALREADY_EXISTS") {
         setMessage("※このメールアドレスはすでに登録されています※");
+      } else if (error.message === "REGISTER_REQUEST_INVALID") {
+        setMessage("※入力内容を確認してください※");
       } else {
         setMessage("※ユーザー登録に失敗しました※");
       }
@@ -87,7 +93,7 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
             </button>
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="6文字以上の英数字で入力"
+              placeholder="6~32字の半角英数字･記号で入力"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -96,7 +102,7 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
         <div className="password-note">
           <div>
             ※
-            英字（大文字or小文字）・数字を必ず含む、英数字・記号の6文字以上で入力
+            英字（大文字or小文字）・数字を必ず含む、6~32字の半角英数字・記号で入力
           </div>
           <div>使用できる記号：! @ #</div>
         </div>
@@ -135,7 +141,7 @@ const UserRegisterModal = ({ onClose, onRegisterSuccess }) => {
             </span>
             <input
               type="text"
-              placeholder="ニックネーム"
+              placeholder="ニックネーム(20字以内)"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
             />

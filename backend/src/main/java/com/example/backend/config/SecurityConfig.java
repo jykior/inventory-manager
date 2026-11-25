@@ -90,9 +90,8 @@ public class SecurityConfig {
             // メールアドレス・パスワード・ニックネーム変更
             .requestMatchers(HttpMethod.PATCH, "/api/auth/email", "/api/auth/password", "/api/auth/nickname")
             .hasAnyRole("ADMIN", "MANAGER", "STAFF", "GUEST")
-            //ゲストアカウント削除は除外
             .requestMatchers(HttpMethod.DELETE, "/api/auth")
-            .hasAnyRole("ADMIN", "MANAGER", "STAFF")
+            .hasAnyRole("MANAGER", "STAFF")
 
             .anyRequest()
             .authenticated()
