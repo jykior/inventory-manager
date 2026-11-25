@@ -144,6 +144,9 @@ Spring Securityを利用した認証・認可の仕組みを理解したいと�
 ![インフラ構成図](docs/infrastructure.svg)
 
 ## DB設計
+<table>
+  <tr>
+    <td valign="top">
 
 ### users
 
@@ -154,6 +157,8 @@ Spring Securityを利用した認証・認可の仕組みを理解したいと�
 | password_hash | ハッシュ化したパスワード |
 | role          | 権限           |
 | nickname      | ニックネーム       |
+ </td>
+    <td valign="top">
 
 ### categories
 
@@ -165,6 +170,9 @@ Spring Securityを利用した認証・認可の仕組みを理解したいと�
 | sort_order | 表示順       |
 | is_demo    | デモデータかどうか |
 | guest_id   | ゲストユーザーID |
+
+ </td>
+    <td valign="top">
 
 ### items
 
@@ -179,6 +187,10 @@ Spring Securityを利用した認証・認可の仕組みを理解したいと�
 | sort_order    | 商品の並び順     |
 | is_demo       | デモデータかどうか  |
 | guest_id      | ゲストユーザーID  |
+    
+</td>
+  </tr>
+</table>
 
 ## ER図
 
